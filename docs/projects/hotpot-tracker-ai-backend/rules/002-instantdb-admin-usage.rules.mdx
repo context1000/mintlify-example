@@ -1,0 +1,94 @@
+---
+name: 002-instantdb-admin-usage
+title: InstantDB Admin Usage Rules
+related:
+  projects: [hotpot-tracker-ai-backend]
+  rules: [instantdb-usage-rules]
+  guides: [instantdb-integration-guide]
+---
+
+# InstantDB Admin Usage Rules
+
+## Admin Database Access Rules
+
+### MUST
+
+- Admin database operations MUST always be scoped to authenticated users using `db.asUser({ token })`
+- All database queries MUST validate user permissions before execution
+- Complex queries MUST include proper error handling and logging
+- Database connections MUST use environment variables for configuration
+- Query results MUST be validated before processing or transformation
+
+### MUST NOT
+
+- Never use admin database access without user authentication context
+- Never perform unscoped queries that could access unauthorized data
+- Never expose admin database errors directly to client responses
+- Never hardcode database configuration values
+
+## User-Scoped Operations Rules
+
+### MUST
+
+- User tokens MUST be validated before creating scoped database instances
+- Refresh tokens MUST be verified for authenticity and expiration
+- User context MUST be maintained throughout the entire request lifecycle
+- Database operations MUST respect team-based data isolation
+- Failed authentication MUST result in proper 401 responses
+
+### MUST NOT
+
+- Never assume token validity without explicit verification
+- Never mix user contexts within a single request
+- Never cache user-scoped database instances across requests
+- Never perform operations outside of user's authorized scope
+
+## Query Construction Rules
+
+### MUST
+
+- Complex queries MUST use proper nested structures with `$` operators
+- Query filters MUST include `deletedAt: { $isNull: true }` for soft-deleted entities
+- Associated data MUST be included explicitly in query structure
+- Query results MUST be typed properly using schema types
+- Large queries MUST implement appropriate pagination
+
+### MUST NOT
+
+- Never construct queries without proper filtering for active records
+- Never ignore query typing - always use schema-generated types
+- Never assume associated data is loaded without explicit inclusion
+- Never perform unbounded queries without limits
+
+## Data Transformation Rules
+
+### MUST
+
+- Raw query results MUST be transformed into clean, typed structures
+- Data mapping functions MUST handle null/undefined values gracefully
+- Complex transformations MUST be broken into reusable, testable functions
+- User-specific data parsing MUST validate JSON structure before use
+- Date/timestamp handling MUST include proper error handling
+
+### MUST NOT
+
+- Never return raw database structures directly to API responses
+- Never assume data structure without null checks
+- Never perform transformations without proper type safety
+- Never ignore parsing errors for user-provided JSON data
+
+## Error Handling Rules
+
+### MUST
+
+- Database errors MUST be caught and logged with appropriate context
+- User-facing errors MUST be sanitized to prevent information leakage
+- Connection failures MUST be handled with appropriate retry logic
+- Query timeouts MUST result in proper 500 responses with generic messages
+
+### MUST NOT
+
+- Never expose internal database errors to API responses
+- Never ignore database connection state issues
+- Never assume queries will always succeed
+- Never leak sensitive data through error messages

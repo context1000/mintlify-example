@@ -1,0 +1,77 @@
+---
+name: 001-ai-api-endpoint
+title: AI API Endpoint Rules
+related:
+  projects: [hotpot-tracker-ai-backend]
+  guides: [hotpot-tracker-ai-backend-tech-stack]
+---
+
+# AI API Endpoint Rules
+
+## Request Handling Rules
+
+### MUST
+
+- All API endpoints MUST validate request parameters before processing
+- All endpoints MUST return structured error responses with `statusCode`, `error`, and `message` fields
+- AI endpoints MUST use streaming responses for real-time content delivery
+- All endpoints MUST implement proper CORS configuration for allowed origins
+- Request validation MUST include type checking for required parameters
+- Large data operations MUST be paginated or limited to prevent timeouts
+
+### MUST NOT
+
+- Never process requests without validating required parameters
+- Never return sensitive information in error messages
+- Never allow unlimited request sizes without proper limits
+- Never expose internal system errors to clients
+
+## AI Integration Rules
+
+### MUST
+
+- AI requests MUST include system prompts that constrain response scope
+- Streaming responses MUST use proper data stream headers (`X-Vercel-AI-Data-Stream`)
+- AI prompts MUST sanitize user data to prevent prompt injection
+- AI responses MUST be language-aware based on detected input language
+- Error handling MUST gracefully handle AI service failures
+
+### MUST NOT
+
+- Never include user IDs or sensitive data in AI prompts
+- Never allow direct prompt manipulation from client requests
+- Never stream responses without proper content-type headers
+- Never ignore AI service rate limits or errors
+
+## Data Processing Rules
+
+### MUST
+
+- Database queries MUST be scoped to authenticated user's accessible data
+- Complex data transformations MUST be broken into testable functions
+- Board data mapping MUST preserve data structure integrity
+- Date formatting MUST handle invalid dates gracefully
+- JSON parsing MUST include try-catch blocks for safety
+
+### MUST NOT
+
+- Never process data without user authentication context
+- Never assume data structure without validation
+- Never expose raw database errors to API responses
+- Never perform unscoped database queries
+
+## Response Format Rules
+
+### MUST
+
+- Success responses MUST follow consistent structure patterns
+- Error responses MUST include actionable details for debugging
+- Streaming endpoints MUST set appropriate content-type headers
+- Status codes MUST accurately reflect the response type (200, 400, 401, 404, 500)
+
+### MUST NOT
+
+- Never return inconsistent response structures
+- Never expose stack traces in production error responses
+- Never use generic error messages without context
+- Never omit proper HTTP status codes

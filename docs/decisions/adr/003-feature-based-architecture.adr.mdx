@@ -1,0 +1,73 @@
+---
+name: 003-feature-based-architecture
+title: Feature-Based Code Organization
+status: accepted
+tags: [architecture, organization, scalability, maintainability]
+related:
+  adrs: [0002-react-spa-architecture]
+  rules: [code-organization-rules]
+  guides: [feature-development-guide]
+  projects: [hotpot-tracker-overview]
+---
+
+# Feature-Based Code Organization
+
+## Context
+
+As Hotpot Tracker grows, we need a scalable code organization strategy that:
+
+- Groups related functionality together for better cohesion
+- Minimizes coupling between different business domains
+- Makes it easy to locate and modify code across the application
+- Supports team collaboration on different features simultaneously
+- Facilitates feature-based development, testing, and deployment
+- Enables potential feature extraction as separate packages
+
+The team will grow and different developers need to work on different features without conflicts. The current flat structure in `src/` will become unwieldy as we add more components, hooks, and utilities.
+
+Considerations:
+- Clear boundaries between business domains
+- Shared code identification and placement
+- Cross-feature communication patterns
+- Testing and development workflow impact
+
+## Decision
+
+We will organize code using a feature-based architecture with the following structure:
+
+```
+src/
+├── features/          # Feature-specific code
+│   ├── auth/         # Authentication flows
+│   ├── board/        # Board management
+│   ├── task/         # Task operations
+│   ├── team/         # Team management
+│   ├── account/      # User account settings
+│   └── issue/        # Issue tracking
+├── components/       # Shared UI components
+├── hooks/           # Shared React hooks
+├── utils/           # Shared utilities
+├── pages/           # Page-level components
+└── core/            # Core business logic
+```
+
+Each feature folder will contain all code specific to that business domain, while shared code goes in dedicated folders. Pages act as composition layers that combine features.
+
+## Consequences
+
+### What becomes easier:
+- Clear mental model for where code belongs reduces cognitive load
+- Reduced merge conflicts when teams work on different features
+- Feature-based testing and development becomes straightforward
+- Code ownership and responsibility boundaries are well-defined
+- Refactoring within feature boundaries is simpler and safer
+- Feature flagging and A/B testing implementation is more natural
+- Potential extraction of features as separate packages or services
+
+### What becomes more difficult:
+- Initial overhead in deciding and maintaining feature boundaries
+- Risk of code duplication if shared code isn't properly identified
+- Cross-feature refactoring becomes more complex and coordinated
+- Feature coupling can still occur through shared state or APIs
+- New developers need to understand the organizational principles
+- Shared utilities may become bloated without proper governance

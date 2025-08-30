@@ -1,0 +1,167 @@
+---
+name: hotpot-tracker-ai-backend
+title: Hotpot Tracker AI Backend
+tags: [nodejs, typescript, fastify, ai, openai, instantdb, backend]
+repository: <link>
+related:
+  rfcs: []
+  adrs: [001-instantdb-backend-choice]
+  rules: [001-ai-api-endpoint, 002-instantdb-admin-usage-rules, 003-authentication-security-rules]
+  guides: [001-tech-stack]
+  projects: [hotpot-tracker-frontend]
+---
+
+# Hotpot Tracker AI Backend
+
+## Overview
+
+The Hotpot Tracker AI Backend is a Node.js/TypeScript service that provides AI-powered analytics and reporting for the Hotpot Tracker project management application. It serves as a companion service to generate intelligent insights about project boards, team performance, and task management through integration with OpenAI's GPT-4 model.
+
+## Architecture
+
+### Technology Stack
+
+- **Runtime**: Node.js with TypeScript
+- **Framework**: Fastify (high-performance web framework)
+- **Database**: InstantDB (real-time database with optimistic updates)
+- **AI Integration**: OpenAI GPT-4 via AI SDK
+- **Authentication**: InstantDB user authentication with refresh tokens
+
+### Core Components
+
+#### 1. AI Report Generation (`/api/ai-report`)
+
+- Generates comprehensive board analytics using GPT-4
+- Supports multiple report presets (basic board overview, team performance)
+- Streams responses in real-time using AI SDK's data streaming
+- Requires authentication via refresh token headers
+
+#### 2. Account Management (`/api/account`)
+
+- User account deletion functionality
+- Secure token-based authentication
+- Proper error handling and validation
+
+#### 3. Health Check (`/health`)
+
+- Simple health endpoint for monitoring and deployment verification
+
+## Features
+
+### Report Types
+
+#### Basic Board Overview
+
+Generates comprehensive analysis including:
+- Board summary with task counts and parameters
+- Column-wise task distribution and approval rules
+- Task status overview with approval tracking
+- Team member analysis and workload distribution
+
+#### Team Performance Report
+
+Provides detailed team analytics:
+- Individual performance metrics
+- Task activity timelines and update patterns
+- Workload distribution analysis
+- Unassigned task tracking
+- Cross-approval pattern analysis
+
+### Data Processing
+
+The service processes complex relational data from InstantDB including:
+- **Boards**: Project containers with smart parameters
+- **Columns**: Workflow stages with approval rules
+- **Tasks**: Work items with metadata and approvals
+- **Teams**: User groups and memberships
+- **Contributors**: Role-based access control
+- **Smart Parameters**: Dynamic metadata for boards and tasks
+
+### Security & Authentication
+
+- Token-based authentication using InstantDB's user system
+- Scoped database access per authenticated user
+- CORS configuration for web application integration
+- Proper error handling and validation
+
+## API Endpoints
+
+### POST `/api/ai-report`
+
+Generates AI-powered board analytics.
+
+**Headers:**
+- `refresh_token`: InstantDB user refresh token
+
+**Body:**
+```json
+{
+  "boardId": "string",
+  "preset": "basic" | "team"
+}
+```
+
+**Response:** Streaming text response with AI-generated report
+
+### DELETE `/api/account`
+
+Deletes user account and associated data.
+
+**Headers:**
+- `refresh_token`: InstantDB user refresh token
+
+**Response:** Status confirmation
+
+### GET `/health`
+
+Simple health check endpoint.
+
+**Response:**
+```json
+{
+  "status": "ok"
+}
+```
+
+## Database Schema
+
+The service works with a comprehensive InstantDB schema including:
+- User management (users, memberships, invites)
+- Project structure (teams, boards, columns, statuses)
+- Task management (tasks, approvals, contributors)
+- Metadata system (smart parameters)
+- Activity tracking (events)
+
+## Configuration
+
+### Environment Variables
+
+- `INSTANT_APP_ID`: InstantDB application identifier
+- `INSTANT_APP_ADMIN_TOKEN`: InstantDB admin token for server-side operations
+- `PORT`: Server port (defaults to 8080)
+- OpenAI API key (configured via AI SDK)
+
+### CORS Configuration
+
+Configured to allow requests from:
+- `https://localhost:5173` (development)
+- `https://hotpot-tracker.app` (production)
+- `https://www.hotpot-tracker.app` (production with www)
+
+## Deployment
+
+The service is designed for containerized deployment with:
+- TypeScript compilation to JavaScript
+- Production-ready Fastify server
+- Health check endpoint for load balancer integration
+- Proper error logging and monitoring
+
+## Integration
+
+The AI backend integrates seamlessly with the main Hotpot Tracker frontend application by:
+- Sharing the same InstantDB database and schema
+- Using consistent authentication mechanisms
+- Providing real-time streaming responses
+- Following the same team-based access control patterns
+
+This service enhances the project management experience by providing intelligent insights that help teams understand their workflow patterns, identify bottlenecks, and optimize their project delivery processes.

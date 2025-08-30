@@ -1,0 +1,323 @@
+---
+name: 003-instantdb-integration
+title: InstantDB Integration Guide
+tags: [instantdb, database, react, realtime, integration]
+related:
+  rfcs: [0001-database-backend-evaluation]
+  adrs: [0001-instantdb-backend-choice]
+  rules: [instantdb-usage-rules]
+  projects: [hotpot-tracker-overview]
+---
+
+# InstantDB Integration Guide
+
+## Database Setup
+
+Initialize InstantDB with schema and configuration:
+
+```typescript
+// src/instantdb.ts
+import { init } from '@instantdb/react';
+import schema from '../instant.schema';
+
+export const db = init({
+  appId: import.meta.env.VITE_INSTANT_APP_ID,
+  schema,
+});
+```
+
+Define entities with proper indexing and relationships:
+
+```typescript
+// instant.schema.ts
+import { i } from '@instantdb/react';
+
+const _schema = i.schema({
+  entities: {
+    tasks: i.entity({
+      title: i.string().indexed(),
+      content: i.json().optional(),
+      teamId: i.string(), // Required for multi-tenancy
+      createdAt: i.date().indexed().optional(),
+    }),
+  },
+  links: {
+    tasksTeams: {
+      forward: { on: 'tasks', has: 'one', label: 'teams' },
+      reverse: { on: 'teams', has: 'many', label: 'tasks' }
+    }
+  }
+});
+```
+
+## Data Fetching
+
+Use `useQuery` for reactive data fetching with proper error handling:
+
+```typescript
+function TaskList({ teamId }: { teamId: string }) {
+  const { data, isLoading, error } = db.useQuery({
+    tasks: {
+      $: { where: { teamId, deletedAt: { $isNull: true } } },
+      teams: {}
+    }
+  });
+
+  if (isLoading) return <Spinner />;
+  if (error) return <ErrorMessage error={error} />;
+  
+  return (
+    <div>
+      {data.tasks.map(task => (
+        <TaskCard key={task.id} task={task} />
+      ))}
+    </div>
+  );
+}
+```
+
+Query optimization with field selection and pagination:
+
+```typescript
+// Optimize data transfer
+const { data } = db.useQuery({
+  tasks: {
+    $: { 
+      where: { teamId },
+      fields: ['id', 'title', 'completed'],
+      limit: 50,
+      order: { createdAt: 'desc' }
+    }
+  }
+});
+
+// Conditional queries
+const query = user ? {
+  tasks: { $: { where: { teamId: user.teamId } } }
+} : null;
+```
+
+## Data Mutations
+
+Create entities using transactions with proper ID generation:
+
+```typescript
+import { id } from '@instantdb/react';
+
+function CreateTask({ teamId }: { teamId: string }) {
+  const [title, setTitle] = useState('');
+  
+  const handleSubmit = async () => {
+    try {
+      await db.transact(
+        db.tx.tasks[id()].update({
+          title,
+          teamId,
+          createdAt: new Date(),
+          creatorId: user.id
+        })
+      );
+      setTitle('');
+    } catch (error) {
+      console.error('Failed to create task:', error);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input 
+        value={title} 
+        onChange={(e) => setTitle(e.target.value)} 
+        placeholder="Task title" 
+      />
+      <button type="submit">Create Task</button>
+    </form>
+  );
+}
+```
+
+Update and delete operations:
+
+```typescript
+// Update entity
+const updateTask = (taskId: string, updates: Partial<Task>) => {
+  db.transact(
+    db.tx.tasks[taskId].update({
+      ...updates,
+      updatedAt: new Date()
+    })
+  );
+};
+
+// Soft delete pattern
+const deleteTask = (taskId: string) => {
+  db.transact(
+    db.tx.tasks[taskId].update({
+      deletedAt: new Date()
+    })
+  );
+};
+
+// Link entities
+const linkTaskToProject = (taskId: string, projectId: string) => {
+  db.transact(
+    db.tx.tasks[taskId].link({ projects: projectId })
+  );
+};
+```
+
+## Authentication
+
+Handle authentication flow with proper state management:
+
+```typescript
+// App-level authentication check
+function App() {
+  const { user, isLoading } = db.useAuth();
+
+  if (isLoading) return <LoadingSpinner />;
+  
+  if (user) {
+    return <AuthenticatedApp user={user} />;
+  }
+  
+  return <AuthFlow />;
+}
+
+// Magic link authentication
+function EmailForm() {
+  const [email, setEmail] = useState('');
+  const [sent, setSent] = useState(false);
+
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    try {
+      await db.auth.sendMagicCode({ email });
+      setSent(true);
+    } catch (error) {
+      console.error('Failed to send code:', error);
+    }
+  };
+
+  if (sent) return <CodeForm email={email} />;
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input 
+        type="email" 
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        required 
+      />
+      <button type="submit">Send Code</button>
+    </form>
+  );
+}
+```
+
+## Error Handling
+
+Implement comprehensive error handling for queries and mutations:
+
+```typescript
+// Query error handling
+function TaskList() {
+  const { data, isLoading, error } = db.useQuery({ tasks: {} });
+
+  if (error) {
+    return (
+      <div className="error-container">
+        <p>Failed to load tasks: {error.message}</p>
+        <button onClick={() => window.location.reload()}>
+          Retry
+        </button>
+      </div>
+    );
+  }
+  
+  // ... rest of component
+}
+
+// Transaction error handling with user feedback
+async function createTask(taskData: TaskInput) {
+  try {
+    await db.transact(
+      db.tx.tasks[id()].update(taskData)
+    );
+    toast.success('Task created successfully');
+  } catch (error) {
+    console.error('Failed to create task:', error);
+    toast.error('Failed to create task');
+  }
+}
+```
+
+## Performance Best Practices
+
+Batch operations for better performance:
+
+```typescript
+// Batch multiple related operations
+const createProjectWithTasks = async (projectData, taskList) => {
+  const projectId = id();
+  const operations = [
+    db.tx.projects[projectId].update(projectData),
+    ...taskList.map(task => 
+      db.tx.tasks[id()].update({ ...task, projectId })
+    )
+  ];
+  
+  await db.transact(operations);
+};
+
+// Paginate large datasets
+const [page, setPage] = useState(0);
+const ITEMS_PER_PAGE = 20;
+
+const { data } = db.useQuery({
+  tasks: {
+    $: {
+      limit: ITEMS_PER_PAGE,
+      offset: page * ITEMS_PER_PAGE,
+      order: { createdAt: 'desc' }
+    }
+  }
+});
+```
+
+## Common Patterns
+
+Implement frequently used patterns:
+
+```typescript
+// Toggle boolean field
+const toggleTaskComplete = (task: Task) => {
+  db.transact(
+    db.tx.tasks[task.id].update({ 
+      completed: !task.completed,
+      updatedAt: new Date()
+    })
+  );
+};
+
+// Create-or-update pattern with lookup
+const upsertUser = (email: string, userData: UserData) => {
+  db.transact(
+    db.tx.users[lookup('email', email)].update(userData)
+  );
+};
+
+// Conditional transaction
+const archiveCompletedTasks = (tasks: Task[]) => {
+  const completedTasks = tasks.filter(task => task.completed);
+  if (completedTasks.length === 0) return;
+
+  const operations = completedTasks.map(task =>
+    db.tx.tasks[task.id].update({ 
+      archivedAt: new Date() 
+    })
+  );
+  
+  db.transact(operations);
+};
+```

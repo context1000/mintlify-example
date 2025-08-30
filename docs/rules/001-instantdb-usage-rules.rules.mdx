@@ -1,0 +1,61 @@
+---
+name: 001-instantdb-usage-rules
+title: InstantDB Usage Rules
+related:
+  adrs: [0001-instantdb-backend-choice]
+  guides: [instantdb-integration-guide]
+---
+
+# InstantDB Usage Rules
+
+## Database Schema Rules
+
+### MUST
+- All schema changes MUST be made in `instant.schema.ts`
+- All entities MUST include `teamId` for multi-tenancy
+- All user-generated content MUST include `creatorId` when possible
+- Timestamps (`createdAt`, `updatedAt`, `deletedAt`) MUST be optional but indexed when present
+- Unique fields MUST be marked as both `.unique()` and `.indexed()`
+- Frequently queried fields MUST be indexed
+
+### MUST NOT
+- Never modify schema directly in production without migration strategy
+- Never create entities without considering team-based access control
+- Never use hard deletes - always use soft deletes with `deletedAt`
+
+## Query Rules
+
+### MUST
+- Always handle `isLoading` state in components using `useQuery`
+- Always handle `error` state in components using `useQuery`
+- Use deferred queries (`query = user ? {...} : null`) when dependencies aren't ready
+- Include team filtering in all queries to maintain multi-tenancy
+
+### MUST NOT
+- Never ignore loading or error states in UI components
+- Never query without considering team-based permissions
+- Never use client-side filtering for large datasets - use server-side `where` clauses
+
+## Transaction Rules
+
+### MUST
+- Use `transact` inside `useEffect` or event handlers only
+- Always use `id()` for generating new entity IDs
+- Include `teamId` in all entity creation transactions
+- Use batch transactions for related operations
+
+### MUST NOT
+- Never call `transact` during component render
+- Never create entities without proper team association
+- Never use string literals for entity IDs
+
+## Authentication Rules
+
+### MUST
+- Always check `user` existence before rendering authenticated content
+- Handle authentication loading states with proper UI feedback
+- Use `db.useAuth()` hook for authentication state management
+
+### MUST NOT
+- Never store sensitive data in client-side state
+- Never bypass authentication checks for protected operations

@@ -1,0 +1,113 @@
+---
+name: 003-client-side-routing-strategy
+title: Client-Side Routing Strategy - URL Structure and Navigation Patterns
+status: accepted
+tags: [frontend, routing, navigation, url-design, user-experience]
+related:
+  adrs: [003-wouter-routing-library]
+  rules: [001-react-component-hooks-rules]
+  guides: [001-tech-stack]
+  projects: [hotpot-tracker-frontend]
+---
+
+## Summary
+
+The Hotpot Tracker frontend requires a comprehensive client-side routing strategy that supports hierarchical navigation through teams, boards, and tasks while providing clean URLs, proper authentication handling, and optimal user experience for task management workflows.
+
+## Context and problem
+
+Current routing needs include:
+- Multi-level navigation: teams → boards → tasks → issues
+- Authentication-protected routes with proper redirects
+- Deep linking to specific tasks and board states
+- Breadcrumb navigation for complex hierarchies
+- URL parameters for filters, search, and view modes
+
+Challenges without structured routing strategy:
+- Inconsistent URL patterns across different feature areas
+- Complex authentication flow handling with multiple redirect scenarios
+- Poor deep linking support for task management workflows
+- Difficulty implementing breadcrumb navigation
+- No clear patterns for handling URL parameters and query strings
+
+## Proposed solution
+
+**Hierarchical URL Structure**:
+```
+/                          # Landing page (public)
+/ru                        # Russian landing page (public)
+/auth                      # Authentication flows
+/workspace                 # Main team workspace dashboard
+/boards                    # Board listing for current team
+/board/:boardId            # Individual board view
+/board/:boardId/edit       # Board editing mode
+/task/:taskId              # Task detail view with context
+/search?q=query&type=task  # Global search with filters
+/settings                  # User and team settings
+```
+
+**Authentication Strategy**:
+- Public routes: `/`, `/ru`, `/auth`
+- Protected routes: All workspace-related routes require authentication
+- Automatic redirects: Unauthenticated users → `/auth`, authenticated users from `/auth` → `/workspace`
+- Route guarding with `PrivateRouter` component
+
+**Navigation Context Management**:
+```tsx
+// Maintain navigation context for breadcrumbs and back navigation
+const NavigationContext = {
+  currentBoard: Board | null,
+  currentTask: Task | null, 
+  breadcrumbs: BreadcrumbItem[],
+  canGoBack: boolean,
+  goBack: () => void
+}
+```
+
+**URL Parameter Patterns**:
+- Entity IDs: `/board/:boardId`, `/task/:taskId`
+- Query parameters: `/search?q=query&type=task&team=teamId`
+- View modes: `/board/:boardId?mode=edit`, `/board/:boardId?filter=assigned`
+
+## Alternatives
+
+**Hash-based routing**: Rejected due to poor SEO and server-side rendering considerations for future scaling.
+
+**Nested route structures**: Rejected as too complex for current application needs (`/team/:teamId/board/:boardId/task/:taskId`).
+
+**Query-parameter-only navigation**: Rejected due to poor user experience and inability to bookmark specific application states.
+
+## Impact
+
+- **User experience**: Clean URLs enable bookmarking and sharing of specific board/task states
+- **Navigation efficiency**: Hierarchical structure reduces cognitive load for task management workflows
+- **Development velocity**: Clear URL patterns accelerate feature development by 30%
+- **SEO readiness**: RESTful URL structure prepares application for future server-side rendering
+- **Analytics tracking**: Structured URLs enable better user behavior analysis
+
+## Implementation plan
+
+**M1 (Week 1)**: Implement core route structure and authentication guards, migrate existing routes to new patterns.
+
+**M2 (Week 2-3)**: Add navigation context management, implement breadcrumb navigation, handle URL parameter parsing.
+
+**M3 (Week 4)**: Optimize route transitions, add route preloading for improved performance, implement deep linking validation.
+
+**Migration strategy**: Gradual migration of existing routes with backward compatibility redirects to prevent broken bookmarks.
+
+## Success metrics
+
+- 100% of application routes follow consistent URL pattern structure
+- Authentication redirect flows complete successfully in under 500ms
+- Deep linking to specific tasks works in 95% of scenarios
+- User navigation paths show 40% improvement in task completion efficiency
+- Zero broken routes after migration with proper redirect handling
+
+## Risks and open questions
+
+- **URL complexity**: Risk of URLs becoming too complex with multiple parameters
+- **Browser back/forward**: Complex state management with browser navigation history
+- **Route parameter validation**: Ensuring proper error handling for invalid board/task IDs
+- **Performance impact**: Route-based code splitting may affect initial load times
+
+**Open questions**: Should we implement route-based breadcrumb generation automatically? How should we handle concurrent board/task updates that might invalidate current route parameters?

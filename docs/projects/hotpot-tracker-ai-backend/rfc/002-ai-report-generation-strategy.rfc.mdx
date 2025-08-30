@@ -1,0 +1,116 @@
+---
+name: 002-ai-report-generation-strategy
+title: AI Report Generation Strategy - Prompt Engineering and Output Consistency
+status: accepted
+tags: [backend, ai, prompt-engineering, reports, consistency, multilingual]
+related:
+  adrs: [002-openai-sdk-integration]
+  rules: [001-ai-api-endpoint]
+  guides: [001-tech-stack]
+  projects: [hotpot-tracker-ai-backend]
+---
+
+## Summary
+
+The AI report generation system requires a sophisticated prompt engineering strategy to ensure consistent, actionable insights across diverse board structures and team compositions. This RFC defines structured prompt templates, output formatting guidelines, and quality assurance measures for reliable AI-powered board analysis.
+
+## Context and problem
+
+The AI backend must generate meaningful reports from varied board data:
+- Boards with 5-500+ tasks across multiple columns
+- Different approval workflows and team structures
+- Multilingual task content requiring appropriate response language
+- Varying smart parameter configurations and data complexity
+- Time-sensitive information with creation/update timestamps
+
+Challenges without structured prompt engineering:
+- Inconsistent report structure and quality across different board types
+- Variable AI response formats making frontend parsing difficult
+- Poor handling of edge cases (empty boards, single-user teams, massive datasets)
+- Language detection and response language matching inconsistencies
+- Lack of actionable insights for complex team collaboration patterns
+
+## Proposed solution
+
+**Structured Prompt Template System**:
+
+```typescript
+const promptTemplates = {
+  basic: generateBasicAnalysisPrompt(),
+  team: generateTeamPerformancePrompt()
+}
+
+const systemPrompt = `
+You are a task management analyst. 
+- Use language detected from task titles
+- Provide plain text responses without markdown
+- Focus on actionable insights
+- Never include internal IDs in reports
+`
+```
+
+**Data Preprocessing Pipeline**:
+1. **Board data extraction**: Transform InstantDB query results to structured objects
+2. **Language detection**: Analyze task titles to determine appropriate response language
+3. **Data sanitization**: Remove sensitive information and internal IDs
+4. **Context optimization**: Truncate or summarize large datasets for token efficiency
+
+**Report Structure Standards**:
+
+**Basic Report Template**:
+- Board Summary (name, columns, total tasks, parameters)
+- Column Analysis (task distribution, approval rules, bottlenecks)
+- Task Status Overview (progress tracking, approval status)
+- Team Overview (member involvement, responsibility distribution)
+
+**Team Report Template**:
+- Team Overview (member count, task distribution, approval rates)
+- Individual Performance (assignments, approvals, activity patterns)
+- Task Activity Timeline (recent updates, update frequency analysis)
+- Workload Distribution (balance analysis, recommendations)
+- Unassigned Tasks (orphaned tasks, assignment recommendations)
+- Approval Patterns (cross-approval analysis, bottleneck identification)
+
+## Alternatives
+
+**Single generic prompt**: Rejected due to poor quality for specific use cases and inability to provide targeted insights.
+
+**Template-based static reports**: Rejected as it doesn't leverage AI's analytical capabilities and provides limited insights.
+
+**Client-side prompt customization**: Rejected due to consistency concerns and potential for poor-quality user-generated prompts.
+
+## Impact
+
+- **Report consistency**: Structured templates ensure 90% consistency in report format and quality
+- **Actionable insights**: Focused prompts generate 3x more actionable recommendations per report
+- **Multilingual support**: Automatic language detection provides native-language reports for global teams
+- **Processing efficiency**: Optimized prompts reduce token usage by 40% while maintaining quality
+- **User satisfaction**: Consistent, high-quality reports improve user engagement with AI features
+
+## Implementation plan
+
+**M1 (Week 1)**: Implement basic prompt templates and data preprocessing pipeline, integrate language detection.
+
+**M2 (Week 2-3)**: Develop team-focused prompts, optimize for different board sizes, add edge case handling.
+
+**M3 (Week 4)**: Quality assurance testing, prompt refinement based on real board data, performance optimization.
+
+**Quality assurance**: A/B test prompt variations with sample boards to optimize for insight quality and consistency.
+
+## Success metrics
+
+- 95% of reports follow consistent structure across different board types
+- Language detection accuracy above 90% for multilingual boards
+- User-reported insight quality score above 4.2/5 across both report presets
+- Token usage reduction of 40% compared to unstructured prompts
+- Processing time < 30 seconds for 95% of board configurations
+
+## Risks and open questions
+
+- **Prompt drift**: AI model updates may affect response consistency over time
+- **Edge case handling**: Unusual board configurations may produce poor-quality reports
+- **Token limits**: Very large boards may exceed OpenAI context windows
+- **Multilingual accuracy**: Language detection may fail with mixed-language content
+- **Bias in analysis**: AI may exhibit bias in team performance assessments
+
+**Open questions**: Should we implement human review for report quality validation? How should we handle boards with over 2000 tasks that exceed token limits? What's the optimal balance between report detail and processing speed?

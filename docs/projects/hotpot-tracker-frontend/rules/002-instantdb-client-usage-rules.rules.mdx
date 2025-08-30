@@ -1,0 +1,100 @@
+---
+name: 002-instantdb-client-usage
+title: InstantDB Client Usage Rules
+related:
+  projects: [hotpot-tracker-frontend]
+  rules: [instantdb-usage-rules]
+  guides: [instantdb-integration-guide, hotpot-tracker-frontend-tech-stack]
+---
+
+# InstantDB Client Usage Rules
+
+## Database Query Rules
+
+### MUST
+- Components MUST handle `isLoading`, `error`, and `data` states from `useQuery`
+- Query objects MUST be properly typed using schema-generated types
+- Queries MUST include team-based filtering for multi-tenancy
+- Large datasets MUST use pagination with `limit` and `offset`
+- Deferred queries MUST use conditional query patterns (`query = user ? {...} : null`)
+
+### MUST NOT
+- Never render components without handling loading states
+- Never ignore error states from database queries
+- Never perform queries without team-based access control
+- Never create unbounded queries that could fetch excessive data
+
+## Real-time Updates Rules
+
+### MUST
+- Components MUST leverage optimistic updates for immediate user feedback
+- Real-time data changes MUST be reflected in UI without manual refresh
+- Subscription cleanup MUST be handled properly in component unmount
+- Collaborative features MUST use InstantDB's presence and rooms APIs
+- Offline state MUST be handled gracefully with appropriate UI feedback
+
+### MUST NOT
+- Never block UI while waiting for server confirmation
+- Never ignore real-time update failures
+- Never create memory leaks through unhandled subscriptions
+- Never assume network connectivity in critical user flows
+
+## Transaction Rules
+
+### MUST
+- Transactions MUST be triggered by user actions or effects only
+- Entity IDs MUST be generated using the `id()` function
+- Complex operations MUST be batched into single transactions
+- Transaction errors MUST be handled with user-friendly messages
+- Optimistic UI updates MUST revert on transaction failure
+
+### MUST NOT
+- Never call `transact` during component render cycles
+- Never use hardcoded or predictable entity IDs
+- Never ignore transaction failure states
+- Never create transactions without proper error boundaries
+
+## Authentication Integration Rules
+
+### MUST
+- Authentication state MUST be checked using `db.useAuth()` hook
+- Protected routes MUST redirect unauthenticated users appropriately
+- User context MUST be available throughout the application
+- Authentication loading states MUST display appropriate UI feedback
+- Logout functionality MUST clear all local state and redirect
+
+### MUST NOT
+- Never assume user authentication without explicit checks
+- Never store sensitive data in component state
+- Never bypass authentication for protected functionality
+- Never ignore authentication state changes
+
+## Schema and Type Safety Rules
+
+### MUST
+- Database queries MUST use schema-generated TypeScript types
+- Entity relationships MUST be properly typed in query results
+- Schema changes MUST be coordinated with backend team
+- Type assertions MUST be avoided in favor of proper schema typing
+- Query result transformations MUST maintain type safety
+
+### MUST NOT
+- Never use `any` type for database query results
+- Never ignore TypeScript errors in database operations
+- Never assume entity structure without proper typing
+- Never modify schema without considering frontend impact
+
+## Performance and Optimization Rules
+
+### MUST
+- Expensive queries MUST be memoized using `useMemo` when appropriate
+- Query results MUST be cached appropriately by InstantDB
+- Component re-renders MUST be minimized for real-time data updates
+- Large datasets MUST implement proper pagination strategies
+- Network usage MUST be optimized through efficient query design
+
+### MUST NOT
+- Never trigger unnecessary re-queries through improper dependencies
+- Never ignore performance implications of complex nested queries
+- Never fetch data that won't be used in the current view
+- Never create excessive subscriptions for the same data

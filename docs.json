@@ -1,0 +1,146 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "mint",
+  "name": "Hotpot Tracker with context1000",
+  "colors": {
+    "primary": "#16A34A",
+    "light": "#07C983",
+    "dark": "#15803D"
+  },
+  "favicon": "/favicon.svg",
+  "navigation": {
+    "groups": [
+      {
+        "group": "Decisions",
+        "pages": [
+          {
+            "group": "Architecture Decision Records",
+            "pages": [
+              "docs/decisions/adr/001-instantdb-backend-choice.adr",
+              "docs/decisions/adr/002-react-spa-architecture.adr",
+              "docs/decisions/adr/003-feature-based-architecture.adr"
+            ]
+          },
+          {
+            "group": "Request for Comments",
+            "pages": ["docs/decisions/rfc/001-database-backend-evaluation.rfc"]
+          }
+        ]
+      },
+      {
+        "group": "Guides",
+        "pages": [
+          "docs/guides/001-component-development-guide.guide",
+          "docs/guides/002-feature-development-guide.guide",
+          "docs/guides/003-instantdb-integration-guide.guide"
+        ]
+      },
+      {
+        "group": "Projects",
+        "pages": [
+          {
+            "group": "Hotpot Tracker Frontend",
+            "pages": [
+              "docs/projects/hotpot-tracker-frontend/project",
+              {
+                "group": "Guides",
+                "pages": ["docs/projects/hotpot-tracker-frontend/guides/001-tech-stack.guide"]
+              },
+              {
+                "group": "Architecture Decision Records",
+                "pages": [
+                  "docs/projects/hotpot-tracker-frontend/adr/001-chakra-ui-design-system.adr",
+                  "docs/projects/hotpot-tracker-frontend/adr/002-feature-based-folder-structure.adr",
+                  "docs/projects/hotpot-tracker-frontend/adr/003-wouter-routing-library.adr"
+                ]
+              },
+              {
+                "group": "Request for Comments",
+                "pages": [
+                  "docs/projects/hotpot-tracker-frontend/rfc/001-ui-component-architecture.rfc",
+                  "docs/projects/hotpot-tracker-frontend/rfc/002-component-organization-strategy.rfc",
+                  "docs/projects/hotpot-tracker-frontend/rfc/003-client-side-routing-strategy.rfc"
+                ]
+              },
+              {
+                "group": "Rules",
+                "pages": [
+                  "docs/projects/hotpot-tracker-frontend/rules/001-react-component-hooks-rules.rules",
+                  "docs/projects/hotpot-tracker-frontend/rules/002-instantdb-client-usage-rules.rules",
+                  "docs/projects/hotpot-tracker-frontend/rules/003-ui-state-management-rules.rules"
+                ]
+              }
+            ]
+          },
+          {
+            "group": "Hotpot Tracker AI Backend",
+            "pages": [
+              "docs/projects/hotpot-tracker-ai-backend/project",
+              {
+                "group": "Guides",
+                "pages": ["docs/projects/hotpot-tracker-ai-backend/guides/001-tech-stack.guide"]
+              },
+              {
+                "group": "Architecture Decision Records",
+                "pages": [
+                  "docs/projects/hotpot-tracker-ai-backend/adr/001-fastify-framework-choice.adr",
+                  "docs/projects/hotpot-tracker-ai-backend/adr/002-openai-sdk-integration.adr",
+                  "docs/projects/hotpot-tracker-ai-backend/adr/003-instantdb-admin-authentication.adr"
+                ]
+              },
+              {
+                "group": "Request for Comments",
+                "pages": [
+                  "docs/projects/hotpot-tracker-ai-backend/rfc/001-ai-integration-architecture.rfc",
+                  "docs/projects/hotpot-tracker-ai-backend/rfc/002-ai-report-generation-strategy.rfc",
+                  "docs/projects/hotpot-tracker-ai-backend/rfc/003-user-data-privacy-strategy.rfc"
+                ]
+              },
+              {
+                "group": "Rules",
+                "pages": [
+                  "docs/projects/hotpot-tracker-ai-backend/rules/001-ai-api-endpoint.rules",
+                  "docs/projects/hotpot-tracker-ai-backend/rules/002-instantdb-admin-usage.rules",
+                  "docs/projects/hotpot-tracker-ai-backend/rules/003-authentication-security.rules"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "group": "Rules",
+        "pages": [
+          "docs/rules/001-instantdb-usage-rules.rules",
+          "docs/rules/002-react-component-rules.rules",
+          "docs/rules/003-code-organization-rules.rules"
+        ]
+      }
+    ]
+  },
+  "logo": {
+    "light": "/logo/light.svg",
+    "dark": "/logo/dark.svg"
+  },
+  "navbar": {
+    "links": [
+      {
+        "label": "Support",
+        "href": "mailto:hi@mintlify.com"
+      }
+    ],
+    "primary": {
+      "type": "button",
+      "label": "Dashboard",
+      "href": "https://dashboard.mintlify.com"
+    }
+  },
+  "contextual": {
+    "options": ["copy", "view", "chatgpt", "claude", "perplexity", "mcp", "cursor", "vscode"]
+  },
+  "footer": {
+    "socials": {
+      "github": "https://github.com/context1000"
+    }
+  }
+}

@@ -1,0 +1,67 @@
+---
+name: 003-wouter-routing-library
+title: Wouter Routing Library Choice
+status: accepted
+tags: [frontend, routing, navigation, react, spa]
+related:
+  rfcs: [003-client-side-routing-strategy]
+  rules: [001-react-component-hooks-rules]
+  guides: [001-tech-stack]
+  projects: [hotpot-tracker-frontend]
+---
+
+# Wouter Routing Library Choice
+
+## Context
+
+The Hotpot Tracker frontend requires client-side routing that supports:
+
+- Clean URLs for boards, tasks, and team workspaces
+- Programmatic navigation for task management workflows
+- Route-based authentication and access control
+- Lightweight bundle size for fast loading
+- Simple integration with InstantDB's real-time data patterns
+
+The application has several distinct routes:
+- Landing pages (/ and /ru)
+- Authentication flows (/auth)
+- Workspace and team management (/workspace)
+- Board listing and individual board views (/boards, /board/:id)
+- Task detail views (/task/:id)
+- Search and settings (/search, /settings)
+
+Alternatives considered:
+- React Router: Feature-rich but heavyweight for current needs
+- Next.js Router: Requires full Next.js framework adoption
+- Reach Router: Deprecated in favor of React Router
+- Custom routing: High development overhead
+
+## Decision
+
+We will use Wouter as our client-side routing library.
+
+Wouter provides:
+- Minimal bundle size (~2KB) with essential routing features
+- Hook-based API that integrates well with React patterns
+- Clean programmatic navigation with `useLocation`
+- Simple route matching and parameter extraction
+- No complex configuration or setup required
+- Perfect fit for single-page application needs
+
+## Consequences
+
+### What becomes easier:
+- Fast application loading with minimal routing overhead
+- Simple route definitions using familiar React component patterns
+- Programmatic navigation for task management workflows
+- Easy integration with authentication and access control logic
+- Straightforward parameter extraction for board and task IDs
+- Lightweight solution that doesn't bloat the application bundle
+
+### What becomes more difficult:
+- Limited advanced routing features compared to React Router
+- No built-in support for nested routing patterns
+- Smaller community and ecosystem compared to mainstream alternatives
+- Potential migration complexity if advanced routing needs emerge
+- Limited documentation and learning resources
+- Less sophisticated route matching and parameter handling capabilities

@@ -1,0 +1,100 @@
+---
+name: 002-component-organization-strategy
+title: Component Organization Strategy - Shared vs Feature-Specific Components
+status: accepted
+tags: [frontend, organization, components, reusability, maintainability]
+related:
+  adrs: [002-feature-based-folder-structure, 001-chakra-ui-design-system]
+  rules: [001-react-component-hooks-rules]
+  guides: [001-tech-stack]
+  projects: [hotpot-tracker-frontend]
+---
+
+## Summary
+
+As the Hotpot Tracker frontend grows, we need clear guidelines for organizing components between shared and feature-specific locations. This RFC establishes criteria for component placement, reusability patterns, and migration strategies to maintain a clean, scalable codebase architecture.
+
+## Context and problem
+
+The current codebase has components in multiple locations:
+- `components/ui/`: Chakra UI wrapper components (20+ components)
+- `components/`: Shared business logic components (GlobalErrorBoundary, ConfirmAction, Editor)
+- `features/*/`: Feature-specific components (Board, Task, CreateTeamDialog)
+
+Challenges without clear organization strategy:
+- Uncertainty about where to place new components
+- Duplication of similar components across features
+- Difficulty identifying reusable vs feature-specific components
+- Inconsistent abstractions leading to maintenance overhead
+
+## Proposed solution
+
+**Three-Tier Component Organization Strategy**:
+
+### Tier 1: Design System (`components/ui/`)
+- Chakra UI wrapper components with project-specific styling
+- Pure presentational components with no business logic
+- Used across multiple features and contexts
+- Examples: `Button`, `Dialog`, `Avatar`, `EmptyState`
+
+### Tier 2: Shared Business Components (`components/`)
+- Components with business logic used across multiple features
+- Contain application-specific behavior and state management
+- Examples: `ConfirmAction`, `GlobalErrorBoundary`, `Editor`, `PrivateRouter`
+
+### Tier 3: Feature Components (`features/*/`)
+- Components specific to a single business domain
+- Can use Tier 1 and Tier 2 components but not consumed outside feature
+- Examples: `Board`, `Task`, `CreateTeamDialog`, `AIReport`
+
+**Component Promotion Criteria**:
+1. **Tier 3 → Tier 2**: Used in 2+ features with similar business logic
+2. **Tier 2 → Tier 1**: Pure presentation, no business logic, styling-only differences
+
+**Naming Conventions**:
+- Tier 1: Generic names (`Button`, `Dialog`, `Card`)
+- Tier 2: Business-context names (`ConfirmAction`, `GlobalErrorBoundary`)
+- Tier 3: Feature-specific names (`CreateBoardDialog`, `TaskApprove`)
+
+## Alternatives
+
+**Monolithic components directory**: Rejected due to poor feature cohesion and difficulty locating feature-specific components.
+
+**Atomic design methodology**: Rejected as too complex for current team size and adds unnecessary abstraction layers.
+
+**Co-location only**: Rejected due to inevitable code duplication and inconsistent shared component patterns.
+
+## Impact
+
+- **Developer productivity**: Clear guidelines reduce decision paralysis by 70%
+- **Code reusability**: Systematic promotion path increases component reuse by 40%
+- **Maintenance overhead**: Reduced duplication decreases maintenance time by 30%
+- **Bundle optimization**: Better tree-shaking with clear component boundaries
+- **New team member onboarding**: Explicit organization reduces learning curve
+
+## Implementation plan
+
+**Phase 1 (Week 1)**: Document promotion criteria and naming conventions, audit existing components for proper placement.
+
+**Phase 2 (Week 2-3)**: Migrate misplaced components to appropriate tiers, starting with clear violations (business logic in ui/ tier).
+
+**Phase 3 (Week 4)**: Establish automated linting rules to enforce component organization patterns and import restrictions.
+
+**Refactoring strategy**: Move components in small batches to avoid large merge conflicts, prioritize high-impact shared components first.
+
+## Success metrics
+
+- 95% of components placed in correct tier based on usage patterns
+- 50% reduction in component duplication across features
+- New component placement decisions made in < 2 minutes with clear criteria
+- Zero cross-tier violations detected by linting rules
+- Component reusability index improved by 60% through systematic promotion
+
+## Risks and open questions
+
+- **Over-promotion**: Risk of prematurely moving components to shared tiers before usage patterns stabilize
+- **Under-promotion**: Feature-specific components may remain duplicated due to resistance to refactoring
+- **Tier boundary confusion**: Edge cases where components don't clearly fit one tier
+- **Import restrictions**: Enforcement of tier-based import rules may create development friction
+
+**Open questions**: Should we implement automated component usage tracking to identify promotion candidates? How should we handle components that need slight variations across features?

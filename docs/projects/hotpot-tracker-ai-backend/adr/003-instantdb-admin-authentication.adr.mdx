@@ -1,0 +1,71 @@
+---
+name: 003-instantdb-admin-authentication
+title: InstantDB Admin Authentication Strategy
+status: accepted
+tags: [backend, authentication, instantdb, security, admin-api]
+related:
+  rfcs: [003-user-data-privacy-strategy]
+  rules: [002-instantdb-admin-usage, 003-authentication-security]
+  guides: [001-tech-stack]
+  projects: [hotpot-tracker-ai-backend]
+---
+
+# InstantDB Admin Authentication Strategy
+
+## Context
+
+The Hotpot Tracker AI backend requires secure authentication patterns that support:
+
+- User authentication validation using InstantDB refresh tokens
+- Scoped database access with user-level permissions
+- Admin-level operations for user account deletion
+- Secure token handling for AI report data access
+- Integration with frontend authentication flows
+- Protection against unauthorized access to sensitive board data
+
+The backend handles two distinct authentication scenarios:
+1. **User-scoped operations**: AI report generation requiring access to user's board data
+2. **Admin operations**: User account deletion requiring elevated privileges
+
+Security requirements include:
+- Validation of refresh tokens for every request
+- Scoped database queries respecting InstantDB permissions
+- Secure handling of user tokens without storage
+- Proper error responses for authentication failures
+
+Alternatives considered:
+- JWT-based custom authentication: Duplicates InstantDB's existing auth system
+- API key authentication: Less secure and bypasses user-level permissions
+- Session-based authentication: Requires additional state management complexity
+- OAuth2 integration: Over-engineered for InstantDB integration requirements
+
+## Decision
+
+We will use InstantDB's refresh token validation with scoped database access for all backend operations.
+
+Authentication implementation:
+- Refresh tokens passed via request headers for all protected endpoints
+- User validation through `scopedDb.auth.getUser()` for each request
+- Scoped database instances (`db.asUser({ token })`) for data access
+- Admin operations using full database privileges where necessary
+- Proper error handling with 401/400 status codes for auth failures
+
+## Consequences
+
+### What becomes easier:
+
+- Seamless integration with frontend authentication flows
+- User-level data access permissions handled automatically by InstantDB
+- No additional token storage or session management required
+- Consistent authentication patterns across all backend endpoints
+- Built-in security through InstantDB's permission system
+- Simple token validation without custom JWT handling
+
+### What becomes more difficult:
+
+- Dependency on InstantDB service availability for all authentication
+- Per-request token validation adds latency to API responses
+- Limited control over authentication flow customization
+- Potential rate limiting from InstantDB auth service with high traffic
+- Error handling complexity with external authentication dependency
+- Debugging authentication issues requires InstantDB service understanding

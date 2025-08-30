@@ -1,0 +1,115 @@
+---
+name: 003-ui-state-management
+title: UI and State Management Rules
+related:
+  projects: [hotpot-tracker-frontend]
+  rules: [003-code-organization-rules]
+  guides: [003-feature-development-guide, hotpot-tracker-frontend-tech-stack]
+---
+
+# UI and State Management Rules
+
+## Chakra UI Component Rules
+
+### MUST
+- UI components MUST use Chakra UI components as the foundation
+- Custom styling MUST be applied through Chakra UI's styling system
+- Theme configuration MUST be centralized in the provider setup
+- Responsive design MUST use Chakra UI's responsive array syntax
+- Accessibility features MUST be maintained when extending Chakra components
+
+### MUST NOT
+- Never bypass Chakra UI styling system with direct CSS unless absolutely necessary
+- Never ignore accessibility props provided by Chakra components
+- Never create custom components that duplicate existing Chakra functionality
+- Never hardcode colors or spacing values instead of using theme tokens
+
+## Theme and Dark Mode Rules
+
+### MUST
+- Theme switching MUST be handled through the centralized theme provider
+- Color mode preferences MUST persist across user sessions
+- All custom colors MUST support both light and dark themes
+- Theme-dependent assets MUST have appropriate variants
+- Color contrast MUST meet accessibility standards in both themes
+
+### MUST NOT
+- Never hardcode theme-specific colors in components
+- Never ignore dark mode compatibility in custom components
+- Never assume a specific theme when styling components
+- Never create inconsistent theming across the application
+
+## Form and Input Handling Rules
+
+### MUST
+- Form validation MUST provide immediate feedback to users
+- Form states MUST be managed consistently across the application
+- Input components MUST handle loading and error states appropriately
+- Form submissions MUST include proper error handling and success feedback
+- Rich text editing MUST use Tiptap editor with consistent configuration
+
+### MUST NOT
+- Never submit forms without proper validation
+- Never ignore form submission errors or loading states
+- Never create inconsistent form behavior across features
+- Never allow invalid data to be submitted to the backend
+
+## Drag and Drop Interface Rules
+
+### MUST
+- Drag and drop operations MUST provide clear visual feedback
+- Drop zones MUST be clearly indicated during drag operations
+- Drag operations MUST handle both successful and failed drop scenarios
+- Drag and drop MUST work consistently across different screen sizes
+- Accessibility alternatives MUST be provided for drag and drop functionality
+
+### MUST NOT
+- Never implement drag and drop without keyboard accessibility alternatives
+- Never ignore edge cases like dragging outside valid drop zones
+- Never create inconsistent drag and drop behavior across components
+- Never forget to handle cleanup for drag and drop event listeners
+
+## Loading and Error State Rules
+
+### MUST
+- Loading states MUST be displayed for all async operations
+- Error states MUST provide actionable feedback to users
+- Empty states MUST guide users on next steps
+- Loading indicators MUST be appropriate for the operation duration
+- Error recovery options MUST be provided when possible
+
+### MUST NOT
+- Never leave users without feedback during loading operations
+- Never display technical error messages to end users
+- Never create jarring transitions between loading and loaded states
+- Never ignore edge cases like network failures or timeouts
+
+## Routing and Navigation Rules
+
+### MUST
+- Route changes MUST be handled smoothly with appropriate loading states
+- Navigation MUST preserve user context and form state when appropriate
+- Protected routes MUST redirect unauthenticated users properly
+- URL parameters MUST be properly typed and validated
+- Browser back/forward navigation MUST work correctly
+
+### MUST NOT
+- Never create broken navigation flows or dead ends
+- Never ignore browser navigation events
+- Never lose user data during navigation without confirmation
+- Never create inconsistent URL patterns across features
+
+## State Synchronization Rules
+
+### MUST
+- Local UI state MUST be synchronized with database state appropriately
+- Optimistic updates MUST provide immediate feedback and handle conflicts
+- Global application state MUST be managed through appropriate patterns
+- Component state MUST be lifted up when shared between siblings
+- State changes MUST be predictable and debuggable
+
+### MUST NOT
+- Never create state synchronization conflicts between components
+- Never ignore state update failures or rollback scenarios
+- Never over-complicate state management for simple use cases
+- Never create circular dependencies in state updates

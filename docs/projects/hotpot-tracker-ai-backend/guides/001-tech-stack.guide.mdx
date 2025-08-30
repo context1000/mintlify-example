@@ -1,0 +1,56 @@
+---
+name: 001-tech-stack
+title: Tech Stack Guide - Hotpot Tracker AI Backend
+tags: [tech-stack, backend, nodejs, typescript, ai, instantdb]
+related:
+  projects: [hotpot-tracker-ai-backend]
+---
+
+# Tech Stack Guide - Hotpot Tracker AI Backend
+
+## Core Technologies
+
+### Runtime & Language
+
+- **Node.js**: JavaScript runtime for server-side execution
+- **TypeScript**: Static type checking and enhanced developer experience
+
+### Web Framework
+
+- **Fastify**: High-performance web framework with built-in validation and serialization
+- **@fastify/cors**: CORS handling for cross-origin requests
+
+### Database & Backend Services
+
+- **InstantDB**: Real-time database with optimistic updates and multiplayer support
+  - `@instantdb/admin`: Server-side database operations
+  - `@instantdb/core`: Core database functionality
+
+### AI & Machine Learning
+
+- **AI SDK**: Vercel's AI SDK for streaming AI responses
+- **@ai-sdk/openai**: OpenAI provider for GPT-4 integration
+
+### Development Tools
+
+- **ts-node**: TypeScript execution for development
+- **tsx**: Fast TypeScript execution
+- **dotenv**: Environment variable management
+
+### Key Dependencies Purpose
+
+| Package | Purpose |
+|---------|---------|
+| `fastify` | HTTP server and routing |
+| `@instantdb/admin` | Database operations with admin privileges |
+| `ai` | Streaming AI responses |
+| `@ai-sdk/openai` | OpenAI GPT-4 integration |
+| `@fastify/cors` | Cross-origin resource sharing |
+| `dotenv` | Environment configuration |
+
+## Architecture Patterns
+
+- **RESTful API**: Standard HTTP endpoints
+- **Streaming Responses**: Real-time AI content delivery
+- **Token-based Authentication**: Secure user authentication
+- **Database Scoping**: User-specific data access

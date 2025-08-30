@@ -1,0 +1,78 @@
+---
+name: 002-react-component-rules
+title: React Component Development Rules
+related:
+  adrs: [0002-react-spa-architecture]
+  guides: [component-development-guide]
+---
+
+# React Component Development Rules
+
+## Component Structure Rules
+
+### MUST
+- Use functional components with React hooks only
+- Export components as named exports (not default exports except for pages)
+- Include TypeScript interfaces for all component props
+- Use proper prop destructuring in component parameters
+- Handle loading and error states for all async operations
+
+### MUST NOT
+- Never use class components in new code
+- Never ignore TypeScript errors or use `any` types
+- Never create components without proper prop typing
+- Never render without handling potential undefined/null states
+
+## Hook Usage Rules
+
+### MUST
+- Follow Rules of Hooks (only call at top level, not in loops/conditions/nested functions)
+- Use `useEffect` cleanup functions for subscriptions and timers
+- Use `useCallback` for functions passed to child components
+- Use `useMemo` for expensive computations only
+- Use custom hooks for reusable stateful logic
+
+### MUST NOT
+- Never call hooks conditionally
+- Never use `useEffect` without considering dependencies array
+- Never forget cleanup in effects that create subscriptions
+
+## State Management Rules
+
+### MUST
+- Keep state as close to where it's used as possible
+- Use `useState` for component-local state
+- Use InstantDB queries for server state
+- Lift state up only when multiple components need it
+- Use proper TypeScript types for all state variables
+
+### MUST NOT
+- Never duplicate server state in local state
+- Never store derived data in state (use computed values instead)
+- Never mutate state directly (always use setter functions)
+
+## Error Handling Rules
+
+### MUST
+- Wrap async operations in try-catch blocks
+- Use Error Boundaries for component-level error handling
+- Display user-friendly error messages
+- Log errors appropriately for debugging
+
+### MUST NOT
+- Never let errors crash the entire application
+- Never display technical error messages to end users
+- Never ignore errors silently
+
+## Performance Rules
+
+### MUST
+- Use React.memo for components that receive stable props
+- Use `useCallback` and `useMemo` appropriately to prevent unnecessary re-renders
+- Implement proper key props for list items
+- Use lazy loading for code splitting when appropriate
+
+### MUST NOT
+- Never use inline object/array literals as props (causes re-renders)
+- Never use array indices as keys for dynamic lists
+- Never over-optimize with unnecessary memoization

@@ -1,0 +1,62 @@
+---
+name: 001-chakra-ui-design-system
+title: Chakra UI Design System Choice
+status: accepted
+tags: [frontend, ui, design-system, react, components]
+related:
+  rfcs: [001-ui-component-architecture]
+  rules: [001-react-component-hooks-rules, 003-ui-state-management-rules]
+  guides: [001-tech-stack]
+  projects: [hotpot-tracker-frontend]
+---
+
+# Chakra UI Design System Choice
+
+## Context
+
+The Hotpot Tracker frontend requires a comprehensive UI component library that supports:
+
+- Rapid development of task management interfaces
+- Consistent design language across boards, columns, and tasks
+- Built-in accessibility features for collaborative environments
+- Dark/light theme support for user preferences
+- Responsive design for desktop and mobile collaboration
+- Complex form components for task creation and editing
+
+The team has strong React/TypeScript skills and needs a solution that integrates seamlessly with InstantDB's real-time updates while providing rich interactive components for collaborative task management.
+
+Alternatives considered:
+- Material-UI: Heavy bundle size, complex customization for task-specific needs
+- Ant Design: Business-focused but limited design flexibility
+- Tailwind + Headless UI: More setup overhead, requires custom component development
+- Custom CSS: High maintenance overhead, inconsistent design patterns
+
+## Decision
+
+We will use Chakra UI v3 as our primary design system and component library.
+
+Chakra UI provides:
+- Comprehensive component library with task management primitives (cards, modals, forms)
+- Built-in theme system with easy dark/light mode switching
+- Excellent TypeScript integration and developer experience
+- Accessibility features out-of-the-box for collaborative interfaces
+- Optimistic rendering support that works well with InstantDB's real-time updates
+- Rich interaction components (drag-and-drop, modals, drawers) for board management
+
+## Consequences
+
+### What becomes easier:
+- Rapid UI development with pre-built, accessible components
+- Consistent design patterns across all task management interfaces
+- Built-in responsive design handling for different screen sizes
+- Theme management and dark mode implementation requires minimal code
+- Form handling and validation for task creation/editing workflows
+- Drag-and-drop interactions for board columns and task management
+
+### What becomes more difficult:
+- Bundle size increase compared to minimal custom CSS solutions
+- Learning curve for Chakra UI's specific patterns and styling approach
+- Potential conflicts with custom styling needs for unique task visualization
+- Dependency on third-party library for critical UI functionality
+- Migration complexity if design requirements outgrow Chakra UI's capabilities
+- Performance considerations with large numbers of task components

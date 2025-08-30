@@ -1,0 +1,59 @@
+---
+name: 001-instantdb-backend-choice
+title: InstantDB Backend Choice
+status: accepted
+tags: [backend, database, realtime, collaboration]
+related:
+  rfcs: [0001-database-backend-evaluation]
+  rules: [instantdb-usage-rules]
+  guides: [instantdb-integration-guide]
+  projects: [hotpot-tracker-overview]
+---
+
+# InstantDB Backend Choice
+
+## Context
+
+Hotpot Tracker requires a real-time, collaborative backend solution that supports:
+
+- Team-based task management with boards and columns
+- Real-time updates for collaborative work environments  
+- User authentication and team memberships
+- Complex relational data structures
+- Offline-first capabilities
+
+The team has strong React/TypeScript skills but limited backend expertise. We need a solution that minimizes backend development while providing enterprise-grade features for collaborative task management.
+
+Alternatives considered:
+- Firebase: Limited relational capabilities, complex real-time queries
+- Supabase: More setup overhead, requires managing PostgreSQL
+- Custom Node.js API: High development and maintenance overhead
+
+## Decision
+
+We will use InstantDB as our primary backend-as-a-service (BaaS) solution.
+
+InstantDB provides:
+- Built-in real-time synchronization and multiplayer features
+- Native support for complex entity relationships
+- Schema-first approach with TypeScript integration
+- Magic link authentication with minimal setup
+- Optimistic updates and offline-first capabilities
+
+## Consequences
+
+### What becomes easier:
+- Rapid development with minimal backend code required
+- Real-time collaboration features work out-of-the-box
+- Schema evolution managed through structured migrations
+- Strong TypeScript integration improves developer experience
+- Authentication and user management handled automatically
+- Offline functionality requires no additional implementation
+
+### What becomes more difficult:
+- Vendor lock-in to InstantDB ecosystem increases migration costs
+- Less control over backend logic compared to custom solutions
+- Potential scaling limitations with complex business logic
+- Learning curve for InstantDB-specific patterns and limitations
+- Limited customization options for advanced use cases
+- Dependency on third-party service for critical application functionality

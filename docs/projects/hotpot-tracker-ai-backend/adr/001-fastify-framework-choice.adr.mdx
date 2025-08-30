@@ -1,0 +1,68 @@
+---
+name: 001-fastify-framework-choice
+title: Fastify Framework Choice for AI Backend
+status: accepted
+tags: [backend, framework, api, performance, typescript]
+related:
+  rfcs: [001-ai-integration-architecture]
+  rules: [001-ai-api-endpoint, 003-authentication-security]
+  guides: [001-tech-stack]
+  projects: [hotpot-tracker-ai-backend]
+---
+
+# Fastify Framework Choice for AI Backend
+
+## Context
+
+The Hotpot Tracker AI backend requires a lightweight, performant Node.js framework that supports:
+
+- High-throughput AI API requests with streaming responses
+- Integration with OpenAI SDK for GPT-4 text generation
+- InstantDB authentication and data access patterns
+- CORS handling for frontend integration
+- Minimal overhead for simple API endpoints
+- TypeScript support for type safety with AI model responses
+
+The backend serves as a bridge between the frontend application and AI services, handling:
+- AI report generation with board data analysis
+- User account deletion through InstantDB admin API
+- Authentication validation using InstantDB refresh tokens
+- Stream processing for real-time AI response delivery
+
+Alternatives considered:
+- Express.js: Industry standard but heavier with less TypeScript integration
+- NestJS: Over-engineered for simple AI proxy service requirements
+- Koa.js: Minimal but requires more middleware setup for TypeScript/CORS
+- Hono: Newer framework with good performance but smaller ecosystem
+
+## Decision
+
+We will use Fastify as the Node.js framework for the AI backend service.
+
+Fastify provides:
+- Excellent performance with built-in request/response validation
+- First-class TypeScript support with strong type inference
+- Built-in plugin system for CORS, authentication, and logging
+- Efficient JSON serialization optimized for API responses
+- Stream handling capabilities essential for AI response streaming
+- Minimal configuration overhead for simple microservice architecture
+
+## Consequences
+
+### What becomes easier:
+
+- High-performance API endpoints with automatic request validation
+- Streaming AI responses with built-in stream handling support
+- TypeScript integration provides better developer experience and type safety
+- Plugin ecosystem handles CORS, logging, and authentication concerns
+- Minimal boilerplate code for simple AI proxy service architecture
+- Built-in request/response lifecycle hooks for monitoring and debugging
+
+### What becomes more difficult:
+
+- Smaller community compared to Express.js ecosystem
+- Learning curve for Fastify-specific patterns and plugin system
+- Limited middleware options compared to Express.js ecosystem
+- Potential migration complexity if requirements outgrow Fastify's capabilities
+- Less documentation and tutorials available for complex integration scenarios
+- Plugin configuration may be more complex than simple Express middleware

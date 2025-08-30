@@ -1,0 +1,110 @@
+---
+name: 001-ai-integration-architecture
+title: AI Integration Architecture - Board Data Analysis and Report Generation
+status: accepted
+tags: [backend, ai, architecture, openai, data-processing, streaming]
+related:
+  adrs: [001-fastify-framework-choice, 002-openai-sdk-integration]
+  rules: [001-ai-api-endpoint]
+  guides: [001-tech-stack]
+  projects: [hotpot-tracker-ai-backend]
+---
+
+## Summary
+
+The Hotpot Tracker AI backend requires a robust architecture for processing complex board data and generating intelligent reports through OpenAI's GPT-4. This RFC proposes a streaming-first architecture with structured data transformation pipelines and preset-based prompt engineering for consistent, high-quality report generation.
+
+## Context and problem
+
+The AI backend must process complex hierarchical data from InstantDB:
+- Boards with metadata and smart parameters
+- Columns with approval rules and task organization
+- Tasks with creation/update timestamps, smart parameters, and approval status
+- Team member assignments and collaboration patterns
+
+Current challenges without structured AI architecture:
+- No standardized approach for transforming InstantDB data into AI prompts
+- Inconsistent report quality without structured prompt templates
+- Limited user feedback during lengthy AI processing operations
+- Difficulty handling varying data complexity across different board sizes
+- No systematic approach for different report types and analysis depths
+
+## Proposed solution
+
+**Streaming AI Architecture** with structured data processing:
+
+```typescript
+// Data transformation pipeline
+const pipeline = {
+  1: extractBoardData(instantDbResult),
+  2: transformToPrompt(boardData, presetTemplate),
+  3: streamAiResponse(prompt, responseHandler),
+  4: deliverToClient(streamedResponse)
+}
+```
+
+**Preset-Based Report Generation**:
+- **Basic Preset**: Board overview, column analysis, task distribution, team summary
+- **Team Preset**: Individual performance, workload distribution, approval patterns, activity timeline
+
+**Data Transformation Strategy**:
+```typescript
+const mappedData = {
+  boardName: string,
+  boardSmartParams: Parameter[],
+  columnsWithTasks: {
+    columnName: string,
+    approveRule: string,
+    tasks: TaskWithMetadata[]
+  }[]
+}
+```
+
+**Streaming Response Architecture**:
+- Real-time text generation with `streamText()` from Vercel AI SDK
+- Data stream management with proper error handling and backpressure
+- Client-side progressive rendering for immediate user feedback
+
+## Alternatives
+
+**Batch processing approach**: Rejected due to poor user experience with long processing times and no progress feedback.
+
+**Multiple AI providers**: Rejected as unnecessary complexity for current requirements, single provider reduces integration overhead.
+
+**Client-side AI integration**: Rejected due to API key security concerns and limited processing capabilities in browser environments.
+
+## Impact
+
+- **User experience**: Real-time streaming provides immediate feedback and engagement during report generation
+- **Report quality**: Structured prompts with preset templates ensure consistent, comprehensive analysis
+- **Performance**: Streaming architecture reduces perceived latency by 60% compared to batch processing
+- **Scalability**: Modular data transformation supports different board complexities and sizes
+- **Maintainability**: Clear separation between data processing and AI integration
+
+## Implementation plan
+
+**Phase 1 (Week 1-2)**: Implement core data transformation pipeline, integrate OpenAI SDK with streaming support, create basic report preset.
+
+**Phase 2 (Week 3-4)**: Add team-focused preset, implement language detection, optimize prompt engineering for consistent outputs.
+
+**Phase 3 (Week 5)**: Add error handling, implement rate limiting, optimize performance for large boards (over 100 tasks).
+
+**Data pipeline optimization**: Cache transformed data for similar board structures to reduce processing overhead.
+
+## Success metrics
+
+- AI report generation completes within 30 seconds for boards with < 50 tasks
+- Streaming responses begin within 3 seconds of request initiation
+- 95% report accuracy for board analysis compared to manual review
+- User satisfaction score above 4.5/5 for AI-generated insights
+- Zero data privacy violations with proper InstantDB scoping
+
+## Risks and open questions
+
+- **AI costs**: Variable costs based on board complexity may become expensive with heavy usage
+- **Rate limiting**: OpenAI API limits may constrain concurrent report generation
+- **Data consistency**: InstantDB real-time updates during AI processing may create inconsistent reports
+- **Prompt engineering**: Maintaining consistent output quality as board structures evolve
+- **Language detection**: Accuracy of language detection from task titles for multilingual reports
+
+**Open questions**: Should we implement report caching for identical board states? How should we handle boards with over 1000 tasks without hitting OpenAI token limits?

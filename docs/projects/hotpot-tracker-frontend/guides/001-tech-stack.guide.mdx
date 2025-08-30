@@ -1,0 +1,107 @@
+---
+name: 001-tech-stack
+title: Tech Stack Guide - Hotpot Tracker Frontend
+tags: [tech-stack, frontend, react, typescript, vite, chakra-ui]
+related:
+  projects: [hotpot-tracker-frontend]
+  adrs: [002-react-spa-architecture, 003-feature-based-architecture]
+  rules: [002-react-component-rules, 003-code-organization-rules]
+  guides: [002-component-development-guide, 003-feature-development-guide]
+---
+
+# Tech Stack Guide - Hotpot Tracker Frontend
+
+## Core Technologies
+
+### Runtime & Language
+
+- **React**: Modern UI library with hooks and functional components
+- **TypeScript**: Static type checking for enhanced developer experience
+- **Vite**: Fast build tool and development server
+
+### UI Framework & Styling
+
+- **Chakra UI**: Modular and accessible component library
+- **Emotion**: CSS-in-JS library for styling
+- **React Icons**: Comprehensive icon library
+- **next-themes**: Theme switching functionality
+
+### Routing & Navigation
+
+- **Wouter**: Lightweight routing library for React SPA
+
+### Database & Backend Integration
+
+- **InstantDB React**: Real-time database with optimistic updates
+  - Real-time multiplayer features
+  - Offline-first architecture
+  - Relational data support
+
+### Rich Text Editing
+
+- **Tiptap**: Headless rich text editor
+  - `@tiptap/react`: React integration
+  - `@tiptap/starter-kit`: Essential editor extensions
+  - `@tiptap/extension-*`: Additional formatting features
+
+### Drag & Drop
+
+- **React DND**: Flexible drag and drop library
+- **React DND HTML5 Backend**: HTML5 drag and drop implementation
+
+### AI Integration
+
+- **AI SDK React**: React hooks for AI streaming responses
+
+### Error Handling & Monitoring
+
+- **Sentry**: Error tracking and performance monitoring
+- **React Error Boundary**: Component-level error handling
+- **Conways Errors**: Functional error handling patterns
+
+### Development Tools
+
+- **ESLint**: Code linting with TypeScript support
+- **Prettier**: Code formatting
+- **Husky**: Git hooks automation
+- **Lint-staged**: Pre-commit code quality checks
+
+### Build & Deployment
+
+- **Vite**: Build tool with TypeScript support
+- **Vite TSConfig Paths**: Import path resolution
+- **Vercel Speed Insights**: Performance monitoring
+
+### Key Dependencies Purpose
+
+| Package | Purpose |
+|---------|---------|
+| `react` + `react-dom` | Core React framework |
+| `@chakra-ui/react` | UI component library |
+| `@instantdb/react` | Real-time database integration |
+| `wouter` | Client-side routing |
+| `@tiptap/react` | Rich text editing |
+| `react-dnd` | Drag and drop functionality |
+| `@ai-sdk/react` | AI streaming responses |
+| `@sentry/react` | Error monitoring |
+| `vite` | Build tool and dev server |
+| `typescript` | Type checking |
+
+## Architecture Patterns
+
+- **Single Page Application (SPA)**: Client-side routing and state management
+- **Feature-based Architecture**: Organized by business features
+- **Component Composition**: Reusable UI components
+- **Real-time Updates**: Optimistic UI with InstantDB
+- **Error Boundaries**: Graceful error handling
+- **Theme System**: Dark/light mode support
+- **Responsive Design**: Mobile-first approach
+
+## Project Structure
+
+- **`/src/components`**: Reusable UI components
+- **`/src/features`**: Feature-specific components and logic
+- **`/src/pages`**: Route-level components
+- **`/src/hooks`**: Custom React hooks
+- **`/src/utils`**: Utility functions and helpers
+- **`/src/core`**: Core business logic

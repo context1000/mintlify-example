@@ -1,0 +1,87 @@
+---
+name: 003-code-organization-rules
+title: Code Organization Rules
+related:
+  adrs: [0003-feature-based-architecture]
+  guides: [feature-development-guide]
+---
+
+# Code Organization Rules
+
+## File and Folder Structure Rules
+
+### MUST
+
+- Use kebab-case for folder names
+- Use PascalCase for component file names
+- Use camelCase for utility file names
+- Place feature-specific code in appropriate feature folders
+- Use index.ts files to create clean public APIs
+- Keep related files close together (colocation principle)
+
+### MUST NOT
+
+- Never mix naming conventions within the same codebase
+- Never place feature-specific code in shared folders
+- Never create circular dependencies between features
+
+## Import/Export Rules
+
+### MUST
+
+- Use named exports for components and utilities
+- Use default exports only for page components
+- Group imports by source (external packages, internal modules, relative imports)
+- Use absolute imports for shared code (`src/components/`, `src/utils/`)
+- Use relative imports only for closely related files
+
+### MUST NOT
+
+- Never use wildcard imports (`import *`) except for React
+- Never mix named and default exports in the same file
+- Never create long import paths with many `../` segments
+
+## Feature Boundaries Rules
+
+### MUST
+
+- Keep feature code self-contained within feature folders
+- Use core layer for cross-feature business logic
+- Expose feature APIs through index files
+- Document feature dependencies clearly
+
+### MUST NOT
+
+- Never import directly from other feature folders
+- Never create tight coupling between features
+- Never bypass feature APIs by importing internal modules
+
+## Shared Code Rules
+
+### MUST
+
+- Place truly shared components in `src/components/`
+- Place shared utilities in `src/utils/`
+- Place shared hooks in `src/hooks/`
+- Create proper abstractions for shared functionality
+
+### MUST NOT
+
+- Never duplicate code across features without justification
+- Never place feature-specific logic in shared folders
+- Never create shared components with feature-specific knowledge
+
+## Documentation Rules
+
+### MUST
+
+- Add JSDoc comments for public APIs
+- Document complex business logic
+- Include usage examples for shared utilities
+- Keep README files up to date
+
+### MUST NOT
+
+- Never leave TODO comments in production code
+- Never document obvious functionality
+- Never let documentation become outdated

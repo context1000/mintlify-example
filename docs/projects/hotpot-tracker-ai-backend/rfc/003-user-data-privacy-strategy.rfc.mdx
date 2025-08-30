@@ -1,0 +1,113 @@
+---
+name: 003-user-data-privacy-strategy
+title: User Data Privacy Strategy - AI Processing and Account Management
+status: accepted
+tags: [backend, privacy, security, data-protection, gdpr, user-management]
+related:
+  adrs: [003-instantdb-admin-authentication]
+  rules: [003-authentication-security, 002-instantdb-admin-usage]
+  guides: [001-tech-stack]
+  projects: [hotpot-tracker-ai-backend]
+---
+
+## Summary
+
+The Hotpot Tracker AI backend processes sensitive team and task data through external AI services while providing user account deletion capabilities. This RFC establishes comprehensive data privacy and protection strategies to ensure GDPR compliance, secure AI processing, and proper user data lifecycle management.
+
+## Context and problem
+
+The AI backend handles sensitive data across multiple scenarios:
+- **AI Report Generation**: Board data, task content, team member information sent to OpenAI
+- **Account Deletion**: Complete user data removal through InstantDB admin APIs
+- **Authentication Processing**: Refresh token validation and user session management
+- **Data Transmission**: Board metadata, task titles, and team collaboration patterns
+
+Privacy challenges without structured data protection:
+- Sensitive task content and team information exposed to external AI services
+- No systematic approach for data anonymization before AI processing
+- Unclear user data retention policies for AI-generated reports
+- Potential GDPR compliance issues with third-party AI service integration
+- No audit trail for data processing and user account modifications
+
+## Proposed solution
+
+**Data Minimization Strategy**:
+```typescript
+const sanitizeForAI = (boardData) => ({
+  // Remove sensitive identifiers
+  boardName: boardData.name,
+  anonymizedTasks: boardData.tasks.map(task => ({
+    title: task.title, // Keep for language detection
+    status: task.status,
+    created: task.createdAt,
+    // Remove: assigneeEmail, internalIds, sensitiveParams
+  })),
+  teamSize: boardData.teamMembers.length,
+  // Remove: actual member emails, personal information
+})
+```
+
+**AI Processing Privacy Controls**:
+- Data sanitization pipeline removes user emails and internal IDs before AI processing
+- Task content limited to titles and status for analysis (no detailed descriptions)
+- Team member information aggregated to counts and roles (no personal identifiers)
+- No persistent storage of board data on backend servers
+
+**Account Deletion Implementation**:
+```typescript
+// Complete user data removal through InstantDB admin API
+const deleteUserAccount = async (refreshToken) => {
+  await scopedDb.auth.deleteUser({ refresh_token: refreshToken })
+  // InstantDB handles cascading deletion of user's boards, tasks, etc.
+}
+```
+
+**Data Retention Policies**:
+- No persistent storage of user data on backend servers
+- AI-generated reports not cached or stored beyond request lifecycle
+- Authentication tokens processed in memory only, never persisted
+- Request/response logging excludes sensitive user data
+
+## Alternatives
+
+**On-premise AI processing**: Rejected due to high infrastructure costs and limited AI model capabilities compared to OpenAI.
+
+**Full data anonymization**: Rejected as it would reduce AI report quality and eliminate personalized insights.
+
+**User consent per request**: Rejected due to poor user experience and friction in AI report generation workflow.
+
+## Impact
+
+- **GDPR compliance**: Systematic data protection ensures regulatory compliance for EU users
+- **User trust**: Transparent privacy practices build confidence in AI feature usage
+- **Risk mitigation**: Data minimization reduces exposure in potential security incidents
+- **Audit capability**: Clear data processing trails support compliance verification
+- **User control**: Account deletion provides complete data lifecycle management
+
+## Implementation plan
+
+**Phase 1 (Week 1)**: Implement data sanitization pipeline, remove sensitive information from AI processing.
+
+**Phase 2 (Week 2)**: Add account deletion endpoint with comprehensive user data removal, implement audit logging.
+
+**Phase 3 (Week 3)**: Privacy policy integration, user consent workflows, data retention policy enforcement.
+
+**Compliance verification**: Regular audits of data processing flows to ensure continued privacy protection.
+
+## Success metrics
+
+- 100% of AI requests processed with sanitized data (no personal identifiers)
+- Account deletion completes within 24 hours with full data removal verification
+- Zero instances of sensitive data in AI processing logs
+- GDPR compliance score above 95% in privacy audit assessments
+- User privacy satisfaction score above 4.6/5 in trust surveys
+
+## Risks and open questions
+
+- **AI service changes**: OpenAI data handling policies may change affecting privacy guarantees
+- **Data inference**: AI models might infer sensitive information from seemingly anonymous data
+- **Compliance evolution**: New privacy regulations may require additional protection measures
+- **Cross-border data transfer**: OpenAI processing may involve international data transfers
+- **Data breach scenarios**: Incident response procedures for potential AI service data exposure
+
+**Open questions**: Should we implement user-configurable privacy levels for AI processing? How should we handle data residency requirements for EU customers? What's the optimal balance between data privacy and AI report quality?

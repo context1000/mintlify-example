@@ -1,0 +1,91 @@
+---
+name: 001-database-backend-evaluation
+title: Database Backend Evaluation - InstantDB vs Supabase
+status: accepted
+tags: [backend, database, evaluation, instantdb, supabase, realtime]
+related:
+  adrs: [0001-instantdb-backend-choice]
+  rules: [instantdb-usage-rules]
+  guides: [instantdb-integration-guide]
+  projects: [hotpot-tracker-overview]
+---
+
+## Summary
+
+The development team needs to select a Backend-as-a-Service (BaaS) solution for Hotpot Tracker's collaborative task management platform. This RFC evaluates InstantDB vs Supabase, ultimately recommending InstantDB for its superior real-time collaboration features and React integration that align with our team expertise and rapid development needs.
+
+## Context and problem
+
+Hotpot Tracker requires a backend solution supporting real-time multiplayer collaboration, complex relational data (teams, boards, tasks), multi-tenant architecture, and offline-first capabilities. The team has strong React/TypeScript skills but limited backend expertise, requiring a solution that minimizes backend development overhead while providing enterprise-grade collaborative features.
+
+Current limitations without a backend:
+
+- No data persistence or user authentication
+- No real-time synchronization between team members
+- No structured data relationships for complex task management
+- No offline capabilities or conflict resolution
+
+## Proposed solution
+
+- **InstantDB as primary BaaS**: Provides native real-time multiplayer, graph-based relational queries, and React-first integration
+- **Schema-as-code approach**: Define entities and relationships in TypeScript with automatic type generation and migrations
+- **Magic link authentication**: Built-in user management with minimal configuration required
+
+```typescript
+// Example InstantDB integration
+const { data, isLoading } = db.useQuery({
+  boards: {
+    $: { where: { teamId } },
+    columns: { tasks: {} }
+  }
+});
+
+db.transact(db.tx.tasks[id()].update({ title, teamId }));
+```
+
+Database schema will include teams, boards, columns, tasks, and issues with proper relationships and team-based multi-tenancy.
+
+## Alternatives
+
+**Supabase**: Rejected due to significant development overhead for real-time features, requiring manual WebSocket management, custom conflict resolution, and PostgreSQL expertise the team lacks.
+
+**Firebase**: Limited relational capabilities make complex task management queries difficult and expensive.
+
+**Custom Node.js API**: High development and maintenance overhead conflicts with rapid development goals.
+
+## Impact
+
+- **Performance**: InstantDB provides optimistic updates and client-side caching for immediate UI feedback
+- **Cost**: Usage-based pricing may be unpredictable but eliminates infrastructure management costs
+- **Compatibility**: No migration needed as this is the initial backend choice
+- **Security**: Built-in authentication and team-based data isolation through schema design
+- **Development speed**: 3-4x faster development compared to custom backend solutions
+
+## Implementation plan
+
+**M1 (Week 1-2)**: Set up InstantDB, define core schema (teams, users, boards), implement authentication flows.
+
+**M2 (Week 3-4)**: Implement task management, real-time board updates, basic collaboration features.
+
+**M3 (Week 5-6)**: Add advanced features (issues, smart params, AI integration), performance optimization.
+
+Rollback plan: All data can be exported via InstantDB APIs for migration to alternative solutions if needed.
+
+## Success metrics
+
+- Real-time updates appear within 200ms across all connected clients
+- Application loads and syncs data in under 2 seconds on 3G connections
+- Development velocity of 2+ major features per sprint maintained
+- Zero authentication-related security incidents
+- User satisfaction score above 4.5/5 for collaboration experience by Q2 2024
+
+## Risks and open questions
+
+- **Vendor lock-in**: InstantDB uses proprietary query system, making migration costly
+- **Scaling unknowns**: Limited data on performance with 1000+ concurrent users
+- **Feature limitations**: May encounter platform constraints requiring custom solutions
+- **Community support**: Smaller ecosystem compared to mature alternatives like Supabase
+- **Pricing predictability**: Usage-based costs could become expensive with high activity
+- **Long-term viability**: Newer platform with uncertain long-term roadmap
+
+**Open questions**: How will conflict resolution work with complex nested data structures? What are the exact limits for query complexity and data volume?

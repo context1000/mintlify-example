@@ -1,0 +1,507 @@
+---
+name: 001-component-development
+title: React Component Development Guide
+tags: [react, components, typescript, chakra-ui, hooks]
+related:
+  adrs: [0002-react-spa-architecture]
+  rules: [react-component-rules]
+  projects: [hotpot-tracker-overview]
+---
+
+# React Component Development Guide
+
+## Component Structure
+
+Create functional components with proper TypeScript integration:
+
+```typescript
+// src/features/task/TaskCard.tsx
+interface TaskCardProps {
+  task: Task;
+  onUpdate?: (task: Task) => void;
+  isEditable?: boolean;
+}
+
+export function TaskCard({ task, onUpdate, isEditable = false }: TaskCardProps) {
+  const [isLoading, setIsLoading] = useState(false);
+  
+  // Always handle loading and error states
+  const { data: taskData, error } = db.useQuery({
+    tasks: { $: { where: { id: task.id } } }
+  });
+
+  const handleUpdate = async (updates: Partial<Task>) => {
+    setIsLoading(true);
+    try {
+      await db.transact(
+        db.tx.tasks[task.id].update(updates)
+      );
+      onUpdate?.(taskData);
+    } catch (error) {
+      console.error('Update failed:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (error) {
+    return <Alert status="error">Failed to load task</Alert>;
+  }
+
+  return (
+    <Card>
+      <CardBody>
+        <Text fontWeight="semibold">{task.title}</Text>
+        {isEditable && (
+          <Button 
+            onClick={() => handleUpdate({ completed: !task.completed })}
+            isLoading={isLoading}
+            size="sm"
+          >
+            {task.completed ? 'Mark Incomplete' : 'Mark Complete'}
+          </Button>
+        )}
+      </CardBody>
+    </Card>
+  );
+}
+```
+
+## Chakra UI Integration
+
+Use Chakra UI components for consistent design:
+
+```typescript
+import { 
+  Box, 
+  VStack, 
+  HStack, 
+  Grid, 
+  Button, 
+  Input, 
+  FormControl, 
+  FormLabel,
+  useToast 
+} from '@chakra-ui/react';
+
+function TaskForm({ onSubmit }: { onSubmit: (task: TaskInput) => void }) {
+  const [formData, setFormData] = useState<TaskInput>({
+    title: '',
+    description: ''
+  });
+  const toast = useToast();
+
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    try {
+      await onSubmit(formData);
+      toast({
+        title: 'Task created',
+        status: 'success',
+        duration: 3000,
+      });
+      setFormData({ title: '', description: '' });
+    } catch (error) {
+      toast({
+        title: 'Failed to create task',
+        status: 'error',
+        duration: 5000,
+      });
+    }
+  };
+
+  return (
+    <Box as="form" onSubmit={handleSubmit}>
+      <VStack spacing={4}>
+        <FormControl isRequired>
+          <FormLabel>Task Title</FormLabel>
+          <Input
+            value={formData.title}
+            onChange={(e) => setFormData(prev => ({ 
+              ...prev, 
+              title: e.target.value 
+            }))}
+            placeholder="Enter task title"
+          />
+        </FormControl>
+        
+        <Button type="submit" colorScheme="blue" width="full">
+          Create Task
+        </Button>
+      </VStack>
+    </Box>
+  );
+}
+```
+
+## Modal and Dialog Patterns
+
+Implement modals using Chakra UI patterns:
+
+```typescript
+import {
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalCloseButton,
+  useDisclosure
+} from '@chakra-ui/react';
+
+function CreateTaskDialog({ boardId }: { boardId: string }) {
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleCreateTask = async (taskData: TaskInput) => {
+    setIsSubmitting(true);
+    try {
+      await db.transact(
+        db.tx.tasks[id()].update({
+          ...taskData,
+          boardId,
+          createdAt: new Date()
+        })
+      );
+      onClose();
+    } catch (error) {
+      console.error('Failed to create task:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <>
+      <Button onClick={onOpen} colorScheme="green">
+        Add Task
+      </Button>
+      
+      <Modal isOpen={isOpen} onClose={onClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Create New Task</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <TaskForm 
+              onSubmit={handleCreateTask}
+              isLoading={isSubmitting}
+            />
+          </ModalBody>
+        </ModalContent>
+      </Modal>
+    </>
+  );
+}
+```
+
+## Custom Hooks
+
+Create reusable hooks for common patterns:
+
+```typescript
+// src/hooks/useTask.ts
+export function useTask(taskId: string) {
+  const { data, isLoading, error } = db.useQuery({
+    tasks: { 
+      $: { where: { id: taskId } },
+      teams: {},
+      columns: {}
+    }
+  });
+
+  const task = data?.tasks?.[0];
+
+  const updateTask = useCallback(async (updates: Partial<Task>) => {
+    return db.transact(
+      db.tx.tasks[taskId].update({
+        ...updates,
+        updatedAt: new Date()
+      })
+    );
+  }, [taskId]);
+
+  const deleteTask = useCallback(async () => {
+    return db.transact(
+      db.tx.tasks[taskId].update({ 
+        deletedAt: new Date() 
+      })
+    );
+  }, [taskId]);
+
+  return {
+    task,
+    isLoading,
+    error,
+    updateTask,
+    deleteTask
+  };
+}
+
+// Usage in component
+function TaskDetail({ taskId }: { taskId: string }) {
+  const { task, isLoading, updateTask, deleteTask } = useTask(taskId);
+
+  if (isLoading) return <Skeleton height="200px" />;
+  if (!task) return <Text>Task not found</Text>;
+
+  return (
+    <VStack align="start" spacing={4}>
+      <Heading size="md">{task.title}</Heading>
+      <HStack>
+        <Button onClick={() => updateTask({ completed: !task.completed })}>
+          Toggle Complete
+        </Button>
+        <Button 
+          onClick={deleteTask} 
+          colorScheme="red" 
+          variant="outline"
+        >
+          Delete
+        </Button>
+      </HStack>
+    </VStack>
+  );
+}
+```
+
+## Form Handling
+
+Implement robust form handling with validation:
+
+```typescript
+// src/hooks/useForm.ts
+export function useForm<T>(
+  initialState: T, 
+  onSubmit: (data: T) => Promise<void>,
+  validate?: (data: T) => Record<string, string>
+) {
+  const [data, setData] = useState<T>(initialState);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const updateField = useCallback((field: keyof T, value: T[keyof T]) => {
+    setData(prev => ({ ...prev, [field]: value }));
+    
+    // Clear field error when user starts typing
+    if (errors[field as string]) {
+      setErrors(prev => ({ ...prev, [field as string]: '' }));
+    }
+  }, [errors]);
+
+  const handleSubmit = useCallback(async (e?: FormEvent) => {
+    e?.preventDefault();
+    
+    // Validate form
+    if (validate) {
+      const validationErrors = validate(data);
+      if (Object.keys(validationErrors).length > 0) {
+        setErrors(validationErrors);
+        return;
+      }
+    }
+
+    setIsSubmitting(true);
+    setErrors({});
+    
+    try {
+      await onSubmit(data);
+      setData(initialState); // Reset form
+    } catch (error) {
+      console.error('Form submission failed:', error);
+      setErrors({ _form: 'Submission failed. Please try again.' });
+    } finally {
+      setIsSubmitting(false);
+    }
+  }, [data, onSubmit, initialState, validate]);
+
+  return {
+    data,
+    errors,
+    isSubmitting,
+    updateField,
+    handleSubmit,
+    setErrors
+  };
+}
+
+// Usage example
+function EditTaskForm({ task, onSave }: EditTaskFormProps) {
+  const { data, errors, isSubmitting, updateField, handleSubmit } = useForm(
+    { title: task.title, description: task.description },
+    onSave,
+    (data) => {
+      const errors: Record<string, string> = {};
+      if (!data.title.trim()) errors.title = 'Title is required';
+      if (data.title.length > 100) errors.title = 'Title too long';
+      return errors;
+    }
+  );
+
+  return (
+    <Box as="form" onSubmit={handleSubmit}>
+      <VStack spacing={4}>
+        <FormControl isInvalid={!!errors.title}>
+          <FormLabel>Title</FormLabel>
+          <Input
+            value={data.title}
+            onChange={(e) => updateField('title', e.target.value)}
+          />
+          <FormErrorMessage>{errors.title}</FormErrorMessage>
+        </FormControl>
+        
+        <Button 
+          type="submit" 
+          isLoading={isSubmitting}
+          colorScheme="blue"
+        >
+          Save Changes
+        </Button>
+      </VStack>
+    </Box>
+  );
+}
+```
+
+## Error Boundaries
+
+Implement error boundaries for graceful error handling:
+
+```typescript
+// src/components/ErrorBoundary.tsx
+import { ErrorBoundary } from 'react-error-boundary';
+
+function ErrorFallback({ 
+  error, 
+  resetErrorBoundary 
+}: { 
+  error: Error; 
+  resetErrorBoundary: () => void;
+}) {
+  return (
+    <Alert status="error">
+      <AlertIcon />
+      <Box>
+        <AlertTitle>Something went wrong!</AlertTitle>
+        <AlertDescription>
+          {error.message}
+        </AlertDescription>
+        <Button 
+          mt={2} 
+          size="sm" 
+          onClick={resetErrorBoundary}
+        >
+          Try again
+        </Button>
+      </Box>
+    </Alert>
+  );
+}
+
+export function TaskErrorBoundary({ children }: { children: ReactNode }) {
+  return (
+    <ErrorBoundary
+      FallbackComponent={ErrorFallback}
+      onError={(error, errorInfo) => {
+        console.error('Task component error:', error, errorInfo);
+        // Send to error reporting service
+      }}
+    >
+      {children}
+    </ErrorBoundary>
+  );
+}
+
+// Usage
+function TaskSection() {
+  return (
+    <TaskErrorBoundary>
+      <TaskList />
+      <CreateTaskButton />
+    </TaskErrorBoundary>
+  );
+}
+```
+
+## Performance Optimization
+
+Optimize components for better performance:
+
+```typescript
+import { memo, useMemo } from 'react';
+
+// Memoize expensive computations
+function TaskStats({ tasks }: { tasks: Task[] }) {
+  const stats = useMemo(() => ({
+    total: tasks.length,
+    completed: tasks.filter(task => task.completed).length,
+    pending: tasks.filter(task => !task.completed).length,
+  }), [tasks]);
+
+  return (
+    <HStack spacing={4}>
+      <Stat>
+        <StatLabel>Total</StatLabel>
+        <StatNumber>{stats.total}</StatNumber>
+      </Stat>
+      <Stat>
+        <StatLabel>Completed</StatLabel>
+        <StatNumber>{stats.completed}</StatNumber>
+      </Stat>
+      <Stat>
+        <StatLabel>Pending</StatLabel>
+        <StatNumber>{stats.pending}</StatNumber>
+      </Stat>
+    </HStack>
+  );
+}
+
+// Memoize components with stable props
+const TaskItem = memo(function TaskItem({ 
+  task, 
+  onToggle 
+}: { 
+  task: Task; 
+  onToggle: (taskId: string) => void; 
+}) {
+  const handleToggle = useCallback(() => {
+    onToggle(task.id);
+  }, [task.id, onToggle]);
+
+  return (
+    <HStack>
+      <Checkbox 
+        isChecked={task.completed}
+        onChange={handleToggle}
+      />
+      <Text>{task.title}</Text>
+    </HStack>
+  );
+});
+
+// Optimize list rendering
+function TaskList({ tasks }: { tasks: Task[] }) {
+  const handleToggleTask = useCallback((taskId: string) => {
+    const task = tasks.find(t => t.id === taskId);
+    if (task) {
+      db.transact(
+        db.tx.tasks[taskId].update({ 
+          completed: !task.completed 
+        })
+      );
+    }
+  }, [tasks]);
+
+  return (
+    <VStack align="start">
+      {tasks.map(task => (
+        <TaskItem
+          key={task.id}
+          task={task}
+          onToggle={handleToggleTask}
+        />
+      ))}
+    </VStack>
+  );
+}
+```

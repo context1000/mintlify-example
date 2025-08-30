@@ -1,0 +1,111 @@
+---
+name: 001-ui-component-architecture
+title: UI Component Architecture - Composition vs Prop Drilling
+status: accepted
+tags: [frontend, architecture, components, react, composition, props]
+related:
+  adrs: [001-chakra-ui-design-system, 002-feature-based-folder-structure]
+  rules: [001-react-component-hooks-rules, 003-ui-state-management-rules]
+  guides: [001-tech-stack]
+  projects: [hotpot-tracker-frontend]
+---
+
+## Summary
+
+The frontend needs a scalable component architecture that handles complex task management interfaces with multiple levels of nested data (teams → boards → columns → tasks → issues). This RFC proposes a composition-based architecture using React context and compound components to avoid prop drilling while maintaining component reusability and testability.
+
+## Context and problem
+
+The Hotpot Tracker frontend manages deeply nested hierarchical data structures:
+- Teams contain multiple boards
+- Boards contain multiple columns with different approval rules
+- Columns contain tasks with smart parameters and approval status
+- Tasks contain issues, replies, and contributor assignments
+
+Current challenges without structured component architecture:
+- Prop drilling through 4-5 levels of component hierarchy
+- Difficulty passing board/column context to deeply nested task components
+- Complex state management for drag-and-drop operations across columns
+- Inconsistent data access patterns across different feature domains
+
+## Proposed solution
+
+**Component Composition Architecture** using React Context and compound components:
+
+```tsx
+// Board-level context provides shared data and actions
+<BoardProvider boardId={boardId}>
+  <Board mode="edit">
+    <BoardHeader />
+    <BoardColumns>
+      {columns.map(column => (
+        <Column key={column.id} columnId={column.id}>
+          <ColumnHeader />
+          <ColumnTasks>
+            {tasks.map(task => (
+              <Task key={task.id} taskId={task.id}>
+                <TaskHeader />
+                <TaskContent />
+                <TaskActions />
+              </Task>
+            ))}
+          </ColumnTasks>
+        </Column>
+      ))}
+    </BoardColumns>
+  </Board>
+</BoardProvider>
+```
+
+**Context Architecture**:
+- `BoardContext`: Board data, drag handlers, column management
+- `ColumnContext`: Column-specific data, task filtering, approval rules
+- `TaskContext`: Task details, smart parameters, issue management
+- `AccountContext`: User data, team membership, permissions
+
+**Shared Component Library**:
+- `components/ui/`: Chakra UI-based design system components
+- `components/`: Business logic components (ConfirmAction, GlobalErrorBoundary)
+- Feature-specific components within each feature directory
+
+## Alternatives
+
+**Props-only approach**: Rejected due to excessive prop drilling and coupling between parent and child components across 4-5 levels of hierarchy.
+
+**Global state (Redux/Zustand)**: Rejected as InstantDB provides real-time data management, making additional global state unnecessary and potentially conflicting.
+
+**Render props pattern**: Rejected due to complexity and nested callback hell with multiple levels of data hierarchies.
+
+## Impact
+
+- **Development velocity**: 2-3x faster component development with shared contexts
+- **Code maintainability**: Reduced coupling between components at different hierarchy levels
+- **Performance**: Context-based optimizations prevent unnecessary re-renders of large task lists
+- **Testing**: Easier unit testing with isolated contexts and compound components
+- **Bundle size**: Minimal impact due to React's built-in context system
+
+## Implementation plan
+
+**M1 (Week 1-2)**: Implement BoardContext and refactor Board/Column components to use composition patterns.
+
+**M2 (Week 3-4)**: Create TaskContext and refactor task management components, implement drag-and-drop with context-based state management.
+
+**M3 (Week 5-6)**: Optimize performance with React.memo and context selectors, add comprehensive testing for compound component patterns.
+
+Migration strategy: Gradual refactoring of existing components to composition patterns without breaking existing functionality.
+
+## Success metrics
+
+- Component props reduced by 60% on average through context usage
+- 40% reduction in component re-renders during typical task management operations
+- Development time for new features decreased by 50% due to reusable composition patterns
+- Test coverage improved to above 85% with isolated context testing
+
+## Risks and open questions
+
+- **Context performance**: Multiple nested contexts may impact performance with large task lists (over 100 tasks per board)
+- **Learning curve**: Team needs to adopt composition patterns and context-based thinking
+- **Over-abstraction**: Risk of creating too many contexts that complicate simple use cases
+- **Debugging complexity**: Context-based state management may be harder to debug than explicit props
+
+**Open questions**: How should context boundaries align with InstantDB query boundaries? Should we implement context selectors to optimize re-render performance?

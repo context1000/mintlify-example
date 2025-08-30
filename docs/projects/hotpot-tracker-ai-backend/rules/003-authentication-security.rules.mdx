@@ -1,0 +1,111 @@
+---
+name: 003-authentication-security
+title: Authentication and Security Rules
+related:
+  projects: [hotpot-tracker-ai-backend]
+  guides: [hotpot-tracker-ai-backend-tech-stack]
+---
+
+# Authentication and Security Rules
+
+## Token Handling Rules
+
+### MUST
+
+- Refresh tokens MUST be validated before processing any authenticated request
+- Token validation MUST happen at the beginning of request processing
+- Invalid tokens MUST result in immediate 401 responses with clear error messages
+- Token-based user retrieval MUST be wrapped in try-catch blocks
+- All authenticated endpoints MUST verify token presence in headers
+
+### MUST NOT
+
+- Never proceed with operations using unvalidated tokens
+- Never cache tokens or user contexts beyond request scope
+- Never expose token validation errors with sensitive details
+- Never allow requests to proceed without proper token verification
+
+## User Authentication Rules
+
+### MUST
+
+- User authentication state MUST be verified before any database operations
+- Authentication failures MUST be logged appropriately for monitoring
+- User context MUST be maintained consistently throughout request lifecycle
+- Authentication errors MUST return standardized error response format
+- User deletion operations MUST verify ownership before execution
+
+### MUST NOT
+
+- Never assume user authentication without explicit verification
+- Never perform user operations without proper authorization checks
+- Never expose user authentication internals in error responses
+- Never allow cross-user data access through authentication bypass
+
+## CORS and Request Security Rules
+
+### MUST
+
+- CORS configuration MUST explicitly list allowed origins
+- CORS settings MUST include appropriate HTTP methods (GET, POST, DELETE)
+- Production origins MUST be validated and kept current
+- Request headers MUST be validated for required authentication data
+- Origin validation MUST be enforced for all cross-origin requests
+
+### MUST NOT
+
+- Never use wildcard (*) CORS origins in production
+- Never allow unauthorized origins to access API endpoints
+- Never bypass CORS validation for convenience
+- Never expose sensitive endpoints without proper origin controls
+
+## Environment and Configuration Security Rules
+
+### MUST
+
+- Environment variables MUST be used for all sensitive configuration
+- API keys and tokens MUST never be hardcoded in source code
+- Configuration validation MUST occur at application startup
+- Missing required environment variables MUST prevent application startup
+- Sensitive configuration MUST be properly secured in deployment
+
+### MUST NOT
+
+- Never commit sensitive credentials to version control
+- Never log or expose environment variable values
+- Never use default or example values for production credentials
+- Never assume environment variables are always available
+
+## Error Handling and Information Disclosure Rules
+
+### MUST
+
+- Error responses MUST follow consistent structure with appropriate detail levels
+- Security-related errors MUST avoid exposing system internals
+- Error logging MUST include sufficient context for debugging
+- Client errors MUST be differentiated from server errors appropriately
+- Stack traces MUST never be exposed in production error responses
+
+### MUST NOT
+
+- Never expose internal system details through error messages
+- Never return different error formats that could leak information
+- Never log sensitive data in error messages or stack traces
+- Never provide error details that could aid malicious attacks
+
+## Request Validation and Data Security Rules
+
+### MUST
+
+- All request parameters MUST be validated for type and format
+- Request size limits MUST be enforced to prevent resource exhaustion
+- Input sanitization MUST occur before processing user data
+- Data validation errors MUST return specific, actionable error messages
+- User-provided data MUST be escaped before inclusion in responses
+
+### MUST NOT
+
+- Never trust client-provided data without validation
+- Never allow unbounded request processing
+- Never expose validation logic that could reveal system structure
+- Never process requests with malformed or suspicious data patterns

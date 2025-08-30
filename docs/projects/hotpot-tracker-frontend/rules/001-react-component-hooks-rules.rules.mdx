@@ -1,0 +1,101 @@
+---
+name: 001-react-component-hooks
+title: React Component and Hooks Rules
+related:
+  projects: [hotpot-tracker-frontend]
+  rules: [002-react-component-rules]
+  guides: [002-component-development-guide, hotpot-tracker-frontend-tech-stack]
+---
+
+# React Component and Hooks Rules
+
+## Component Structure Rules
+
+### MUST
+- Components MUST be functional components using hooks
+- Component names MUST use PascalCase naming convention
+- Props MUST be properly typed using TypeScript interfaces
+- Components MUST handle loading states when dealing with async data
+- Error boundaries MUST be implemented for critical component trees
+- Components MUST be organized by feature in the `/src/features` directory
+
+### MUST NOT
+- Never use class components unless absolutely required for legacy integration
+- Never ignore TypeScript prop type definitions
+- Never render without handling potential loading/error states
+- Never create components without proper error handling
+
+## Custom Hooks Rules
+
+### MUST
+- Custom hooks MUST start with the prefix `use`
+- Hook logic MUST be extracted when shared between multiple components
+- Hooks MUST handle cleanup properly using `useEffect` return functions
+- Complex state logic MUST be encapsulated in custom hooks
+- Hooks MUST include proper dependency arrays in `useEffect`
+
+### MUST NOT
+- Never call hooks conditionally or inside loops
+- Never forget to include dependencies in `useEffect` dependency arrays
+- Never create hooks without proper cleanup mechanisms
+- Never ignore ESLint rules for hooks dependencies
+
+## State Management Rules
+
+### MUST
+- Local component state MUST use `useState` for simple values
+- Complex state logic MUST use `useReducer` when appropriate
+- State updates MUST be performed immutably
+- Global state MUST be managed through context providers when needed
+- State derived from props MUST use `useMemo` or `useCallback` for optimization
+
+### MUST NOT
+- Never mutate state objects directly
+- Never use global state for component-local concerns
+- Never ignore performance implications of state updates
+- Never create unnecessary re-renders through improper memoization
+
+## Event Handling Rules
+
+### MUST
+- Event handlers MUST be defined using `useCallback` when passed as props
+- Form submissions MUST include proper validation and error handling
+- User interactions MUST provide immediate feedback
+- Event handlers MUST prevent default behavior when necessary
+- Async operations MUST include loading states and error handling
+
+### MUST NOT
+- Never create inline event handlers in JSX without memoization
+- Never ignore form validation or submit errors
+- Never allow users to trigger multiple concurrent operations
+- Never forget to handle edge cases in user interactions
+
+## Performance Optimization Rules
+
+### MUST
+- Expensive computations MUST be wrapped with `useMemo`
+- Component re-renders MUST be minimized using `React.memo` when appropriate
+- Large lists MUST implement proper virtualization when necessary
+- Images and assets MUST be optimized and lazy-loaded when possible
+- Bundle size MUST be monitored and optimized regularly
+
+### MUST NOT
+- Never over-optimize components without profiling
+- Never use `React.memo` unnecessarily on simple components
+- Never ignore performance bottlenecks in production
+- Never load all data upfront without pagination or virtualization
+
+## Error Handling Rules
+
+### MUST
+- Components MUST be wrapped in error boundaries at appropriate levels
+- Async operations MUST handle both success and failure cases
+- User-facing errors MUST display helpful error messages
+- Error states MUST provide recovery options when possible
+- Errors MUST be logged appropriately for debugging
+
+### MUST NOT
+- Never let errors crash the entire application
+- Never display technical error messages to end users
+- Never ignore error cases in async operations
+- Never forget to provide fallback UI for error states

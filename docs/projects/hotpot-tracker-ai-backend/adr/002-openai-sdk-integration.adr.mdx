@@ -1,0 +1,67 @@
+---
+name: 002-openai-sdk-integration
+title: OpenAI SDK Integration for AI Report Generation
+status: accepted
+tags: [backend, ai, openai, gpt-4, text-generation, streaming]
+related:
+  rfcs: [002-ai-report-generation-strategy]
+  rules: [001-ai-api-endpoint]
+  guides: [001-tech-stack]
+  projects: [hotpot-tracker-ai-backend]
+---
+
+# OpenAI SDK Integration for AI Report Generation
+
+## Context
+
+The Hotpot Tracker AI backend requires integration with large language models to generate intelligent reports from board and task data. The system needs to:
+
+- Analyze complex board structures with columns, tasks, and team members
+- Generate structured reports in multiple presets (basic, team-focused)
+- Stream responses for real-time user feedback during report generation
+- Handle board data transformation from InstantDB queries to AI prompts
+- Support multiple languages based on task content detection
+- Provide reliable error handling for AI service failures
+
+The AI report feature processes hierarchical data structures:
+- Board metadata and smart parameters
+- Column organization with approval rules
+- Task details including creation/update timestamps
+- Team member assignments and approval patterns
+
+Alternatives considered:
+- Direct OpenAI API calls: More setup overhead, no built-in streaming support
+- Anthropic Claude: Different API patterns, less ecosystem integration
+- Local LLM hosting: High infrastructure overhead and maintenance complexity
+- Multiple AI providers: Unnecessary complexity for current requirements
+
+## Decision
+
+We will use the official OpenAI SDK (`@ai-sdk/openai`) integrated with the Vercel AI SDK for streaming responses.
+
+Integration approach:
+- GPT-4o model for high-quality report analysis and generation
+- Structured prompt templates for different report presets (basic, team)
+- Streaming text generation with real-time response delivery
+- Board data transformation pipeline to convert InstantDB queries into AI prompts
+- Language detection based on task titles for appropriate response language
+
+## Consequences
+
+### What becomes easier:
+
+- Reliable streaming text generation with built-in error handling
+- High-quality report analysis leveraging GPT-4's advanced reasoning capabilities
+- Consistent API patterns with official OpenAI SDK support and updates
+- Structured prompt engineering with predefined report templates
+- Real-time user feedback during report generation through streaming responses
+- Automatic language detection and appropriate response formatting
+
+### What becomes more difficult:
+
+- External dependency on OpenAI service availability and API limits
+- Variable response costs based on board data complexity and report length
+- Prompt engineering complexity for consistent, structured report outputs
+- Potential latency issues with large board datasets requiring extensive analysis
+- Rate limiting considerations for teams generating multiple concurrent reports
+- Model response consistency challenges with complex nested data structures

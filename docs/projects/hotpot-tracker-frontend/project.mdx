@@ -1,0 +1,265 @@
+---
+name: hotpot-tracker-frontend
+title: Hotpot Tracker - Team Task Management Platform
+related:
+  adrs: [0001-instantdb-backend-choice, 0002-react-spa-architecture, 0003-feature-based-architecture]
+  rfcs: [0001-database-backend-evaluation]
+---
+
+# Hotpot Tracker - Team Task Management Platform
+
+## Project Overview
+
+Hotpot Tracker is a collaborative task management platform built for teams that need real-time coordination and structured workflows. It combines the flexibility of Kanban boards with team-based permissions and real-time collaboration features.
+
+## Architecture Summary
+
+### Technology Stack
+
+- **Frontend**: React 18 SPA with TypeScript
+- **UI Library**: Chakra UI with dark/light theme support
+- **Backend**: InstantDB (Backend-as-a-Service)
+- **Routing**: Wouter (lightweight client-side routing)
+- **Build Tool**: Vite with TypeScript
+- **Authentication**: Magic link via InstantDB
+- **Real-time**: InstantDB real-time subscriptions
+
+
+## Core Features
+
+### 1. Team Management
+
+- Multi-tenant architecture with team-based isolation
+- Team invitations and membership management
+- Role-based access control
+- Team settings and configuration
+
+### 2. Board & Column System
+
+- Kanban-style boards for visual task organization
+- Customizable columns with approval rules
+- Drag-and-drop task management
+- Board-level smart parameters
+
+### 3. Task Management
+
+- Rich text task descriptions with TipTap editor
+- Task assignment and approval workflows
+- Issue tracking and discussion threads
+- Task history and event logging
+
+### 4. Real-time Collaboration
+
+- Live updates across team members
+- Real-time cursor tracking
+- Collaborative editing capabilities
+- Presence indicators
+
+### 5. AI Integration
+
+- AI-powered task analysis and reporting
+- Smart parameter extraction
+- Intelligent task categorization
+
+## Data Model
+
+### Core Entities
+
+```
+Users ($users) → Memberships → Teams
+    ↓
+Teams → Boards → Columns → Tasks
+    ↓         ↓
+Statuses  SmartParams
+    ↓
+Events (audit log)
+
+Tasks → Issues → Replies
+```
+
+### Key Relationships
+
+- **Team-centric**: All data belongs to a team for proper multi-tenancy
+- **Hierarchical**: Teams > Boards > Columns > Tasks
+- **Audit Trail**: Events track all significant actions
+- **Discussion**: Issues and replies provide task-level communication
+
+## Project Structure
+
+```
+src/
+├── features/              # Business logic organized by domain
+│   ├── auth/             # Authentication flows
+│   ├── team/             # Team management
+│   ├── board/            # Board and column management
+│   ├── task/             # Task CRUD and workflows
+│   ├── issue/            # Issue tracking and discussions
+│   ├── account/          # User settings and preferences
+│   ├── ai/               # AI integration features
+│   └── smart-params/     # Parameter extraction and management
+├── components/           # Shared UI components
+│   ├── ui/              # Design system components
+│   └── Editor/          # Rich text editor components
+├── pages/               # Route-level page components
+├── hooks/               # Shared React hooks
+├── utils/               # Shared utility functions
+├── core/                # Core business logic
+└── instantdb.ts         # Database configuration
+```
+
+## Development Workflow
+
+### 1. Local Development
+
+```bash
+npm run dev              # Start development server
+npm run type-check       # TypeScript validation
+npm run lint             # ESLint checking
+npm run format           # Prettier formatting
+```
+
+### 2. InstantDB Integration
+
+```bash
+npm run instant:login    # Authenticate with InstantDB
+npm run instant:push     # Deploy schema and permissions
+npm run instant:pull     # Sync remote changes
+```
+
+### 3. Build and Deploy
+
+```bash
+npm run build           # Production build
+npm run preview         # Preview production build
+```
+
+## Security & Permissions
+
+### Multi-tenancy
+
+- All operations scoped to team membership
+- Team-based data isolation in all queries
+- Automatic team filtering in database layer
+
+### Authentication
+
+- Magic link authentication (no passwords)
+- JWT tokens managed by InstantDB
+- Automatic session management
+
+### Authorization
+
+- Team membership required for all operations
+- Feature-level permissions (create, read, update, delete)
+- Role-based access control for team management
+
+## Performance Considerations
+
+### Database Optimization
+
+- Indexed fields for frequent queries (`teamId`, `createdAt`, etc.)
+- Soft deletes to maintain data integrity
+- Efficient relationship modeling
+
+### Frontend Optimization
+
+- Code splitting with lazy loading
+- Optimistic updates for immediate feedback
+- Efficient re-rendering with React.memo
+- Bundle optimization with Vite
+
+### Real-time Features
+
+- Selective subscriptions to reduce bandwidth
+- Debounced updates for high-frequency operations
+- Efficient state management with InstantDB
+
+## Monitoring & Error Handling
+
+### Error Tracking
+
+- Sentry integration for production error monitoring
+- Global error boundaries for graceful failure handling
+- Comprehensive logging for debugging
+
+### Performance Monitoring
+
+- Vercel Speed Insights integration
+- Real-time performance metrics
+- User experience monitoring
+
+## Future Roadmap
+
+### Planned Features
+
+- Mobile app support (React Native)
+- Advanced reporting and analytics
+- Integration with external tools (GitHub, Slack)
+- Advanced AI features (task automation)
+- Custom field types and forms
+
+### Technical Improvements
+
+- Enhanced offline support
+- Performance optimization
+- Accessibility improvements
+- Advanced testing coverage
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js 18+
+- InstantDB account and app ID
+- Environment variables configured
+
+### Quick Start
+
+```bash
+# Clone repository
+git clone [repository-url]
+cd hotpot-tracker
+
+# Install dependencies
+npm install
+
+# Set up environment
+cp .env.example .env.local
+# Add your VITE_INSTANT_APP_ID
+
+# Start development
+npm run dev
+```
+
+### Environment Variables
+
+```env
+VITE_INSTANT_APP_ID=your-instantdb-app-id
+VITE_SENTRY_DSN=your-sentry-dsn (optional)
+```
+
+## Contributing
+
+### Code Standards
+
+- Follow established patterns in [guides](../guides/)
+- Adhere to [rules](../rules/) for consistency
+- Write tests for new features
+- Update documentation for architectural changes
+
+### Pull Request Process
+
+1. Create feature branch from `main`
+2. Implement changes following project conventions
+3. Add tests and update documentation
+4. Submit PR with clear description
+5. Address review feedback
+6. Merge after approval
+
+## Support & Documentation
+
+- **Architecture Decisions**: See [decisions/adr/](../decisions/adr/)
+- **Development Rules**: See [rules/](../rules/)
+- **Implementation Guides**: See [guides/](../guides/)
+- **Issue Tracking**: GitHub Issues
+- **Team Communication**: Internal Slack channels

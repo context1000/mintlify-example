@@ -1,0 +1,80 @@
+---
+name: 002-feature-based-folder-structure
+title: Feature-Based Folder Structure
+status: accepted
+tags: [frontend, architecture, folder-structure, organization, scalability]
+related:
+  rfcs: [002-component-organization-strategy]
+  rules: [001-react-component-hooks-rules, 003-ui-state-management-rules]
+  guides: [001-tech-stack]
+  projects: [hotpot-tracker-frontend]
+---
+
+# Feature-Based Folder Structure
+
+## Context
+
+The Hotpot Tracker frontend requires a scalable folder organization that supports:
+
+- Clear separation between different feature domains (boards, tasks, teams, auth)
+- Easy navigation for developers working on specific features
+- Logical grouping of related components, hooks, and utilities
+- Support for feature-specific business logic and state management
+- Maintainable structure as the application grows in complexity
+
+The codebase currently includes multiple feature domains:
+- Authentication and user management
+- Board and column management
+- Task creation and editing
+- Team collaboration and member management
+- AI reporting and analytics
+- Smart parameters and customization
+
+Alternatives considered:
+- Type-based structure (components/, hooks/, utils/): Poor feature cohesion
+- Flat structure: Becomes unwieldy with growth
+- Domain-driven design: Over-engineered for current team size
+
+## Decision
+
+We will organize code using a feature-based folder structure under `src/features/`.
+
+Structure implementation:
+```
+src/
+  features/
+    auth/           # Authentication flows and user management
+    board/          # Board creation, editing, and visualization
+    task/           # Task management and editing
+    team/           # Team collaboration and member management
+    ai/             # AI reporting and analytics features
+    account/        # User account and profile management
+    issue/          # Issue tracking and resolution
+    smart-params/   # Dynamic parameter configuration
+    events/         # Event handling and notifications
+    web-storage/    # Client-side storage management
+  components/       # Shared UI components
+  hooks/           # Shared custom hooks
+  utils/           # Shared utilities and helpers
+  core/            # Core business logic and services
+```
+
+Each feature contains its own components, hooks, and business logic specific to that domain.
+
+## Consequences
+
+### What becomes easier:
+- Developers can quickly locate all code related to a specific feature
+- Feature teams can work independently with minimal file conflicts
+- New features can be added with clear organizational patterns
+- Business logic is co-located with its corresponding UI components
+- Feature-specific testing and documentation is naturally organized
+- Code reviews are more focused on specific business domains
+
+### What becomes more difficult:
+- Some code duplication across features may occur
+- Shared functionality requires careful consideration of placement
+- Cross-feature dependencies need explicit management
+- Refactoring shared components affects multiple feature directories
+- Initial learning curve for developers familiar with type-based organization
+- Potential for feature boundaries to become unclear over time
