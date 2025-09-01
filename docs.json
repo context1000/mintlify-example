@@ -14,26 +14,22 @@
         "group": "Decisions",
         "pages": [
           {
-            "group": "Architecture Decision Records",
+            "group": "ADR",
             "pages": [
-              "docs/decisions/adr/001-instantdb-backend-choice.adr",
-              "docs/decisions/adr/002-react-spa-architecture.adr",
-              "docs/decisions/adr/003-feature-based-architecture.adr"
+              "docs/decisions/adr/instantdb-backend-choice.adr",
+              "docs/decisions/adr/react-spa-architecture.adr",
+              "docs/decisions/adr/feature-based-architecture.adr"
             ]
           },
           {
-            "group": "Request for Comments",
-            "pages": ["docs/decisions/rfc/001-database-backend-evaluation.rfc"]
+            "group": "RFC",
+            "pages": ["docs/decisions/rfc/database-backend-evaluation.rfc"]
           }
         ]
       },
       {
         "group": "Guides",
-        "pages": [
-          "docs/guides/001-component-development-guide.guide",
-          "docs/guides/002-feature-development-guide.guide",
-          "docs/guides/003-instantdb-integration-guide.guide"
-        ]
+        "pages": ["docs/guides/feature-development-guide.guide", "docs/guides/instantdb-integration-guide.guide"]
       },
       {
         "group": "Projects",
@@ -44,30 +40,30 @@
               "docs/projects/hotpot-tracker-frontend/project",
               {
                 "group": "Guides",
-                "pages": ["docs/projects/hotpot-tracker-frontend/guides/001-tech-stack.guide"]
+                "pages": ["docs/projects/hotpot-tracker-frontend/guides/tech-stack.guide"]
               },
               {
-                "group": "Architecture Decision Records",
+                "group": "ADR",
                 "pages": [
-                  "docs/projects/hotpot-tracker-frontend/adr/001-chakra-ui-design-system.adr",
-                  "docs/projects/hotpot-tracker-frontend/adr/002-feature-based-folder-structure.adr",
-                  "docs/projects/hotpot-tracker-frontend/adr/003-wouter-routing-library.adr"
+                  "docs/projects/hotpot-tracker-frontend/adr/chakra-ui-design-system.adr",
+                  "docs/projects/hotpot-tracker-frontend/adr/feature-based-folder-structure.adr",
+                  "docs/projects/hotpot-tracker-frontend/adr/wouter-routing-library.adr"
                 ]
               },
               {
-                "group": "Request for Comments",
+                "group": "RFC",
                 "pages": [
-                  "docs/projects/hotpot-tracker-frontend/rfc/001-ui-component-architecture.rfc",
-                  "docs/projects/hotpot-tracker-frontend/rfc/002-component-organization-strategy.rfc",
-                  "docs/projects/hotpot-tracker-frontend/rfc/003-client-side-routing-strategy.rfc"
+                  "docs/projects/hotpot-tracker-frontend/rfc/ui-component-architecture.rfc",
+                  "docs/projects/hotpot-tracker-frontend/rfc/component-organization-strategy.rfc",
+                  "docs/projects/hotpot-tracker-frontend/rfc/client-side-routing-strategy.rfc"
                 ]
               },
               {
                 "group": "Rules",
                 "pages": [
-                  "docs/projects/hotpot-tracker-frontend/rules/001-react-component-hooks-rules.rules",
-                  "docs/projects/hotpot-tracker-frontend/rules/002-instantdb-client-usage-rules.rules",
-                  "docs/projects/hotpot-tracker-frontend/rules/003-ui-state-management-rules.rules"
+                  "docs/projects/hotpot-tracker-frontend/rules/react-component-hooks-rules.rules",
+                  "docs/projects/hotpot-tracker-frontend/rules/instantdb-client-usage-rules.rules",
+                  "docs/projects/hotpot-tracker-frontend/rules/ui-state-management-rules.rules"
                 ]
               }
             ]
@@ -78,30 +74,30 @@
               "docs/projects/hotpot-tracker-ai-backend/project",
               {
                 "group": "Guides",
-                "pages": ["docs/projects/hotpot-tracker-ai-backend/guides/001-tech-stack.guide"]
+                "pages": ["docs/projects/hotpot-tracker-ai-backend/guides/tech-stack.guide"]
               },
               {
-                "group": "Architecture Decision Records",
+                "group": "ADR",
                 "pages": [
-                  "docs/projects/hotpot-tracker-ai-backend/adr/001-fastify-framework-choice.adr",
-                  "docs/projects/hotpot-tracker-ai-backend/adr/002-openai-sdk-integration.adr",
-                  "docs/projects/hotpot-tracker-ai-backend/adr/003-instantdb-admin-authentication.adr"
+                  "docs/projects/hotpot-tracker-ai-backend/adr/fastify-framework-choice.adr",
+                  "docs/projects/hotpot-tracker-ai-backend/adr/openai-sdk-integration.adr",
+                  "docs/projects/hotpot-tracker-ai-backend/adr/instantdb-admin-authentication.adr"
                 ]
               },
               {
-                "group": "Request for Comments",
+                "group": "RFC",
                 "pages": [
-                  "docs/projects/hotpot-tracker-ai-backend/rfc/001-ai-integration-architecture.rfc",
-                  "docs/projects/hotpot-tracker-ai-backend/rfc/002-ai-report-generation-strategy.rfc",
-                  "docs/projects/hotpot-tracker-ai-backend/rfc/003-user-data-privacy-strategy.rfc"
+                  "docs/projects/hotpot-tracker-ai-backend/rfc/ai-integration-architecture.rfc",
+                  "docs/projects/hotpot-tracker-ai-backend/rfc/ai-report-generation-strategy.rfc",
+                  "docs/projects/hotpot-tracker-ai-backend/rfc/user-data-privacy-strategy.rfc"
                 ]
               },
               {
                 "group": "Rules",
                 "pages": [
-                  "docs/projects/hotpot-tracker-ai-backend/rules/001-ai-api-endpoint.rules",
-                  "docs/projects/hotpot-tracker-ai-backend/rules/002-instantdb-admin-usage.rules",
-                  "docs/projects/hotpot-tracker-ai-backend/rules/003-authentication-security.rules"
+                  "docs/projects/hotpot-tracker-ai-backend/rules/ai-api-endpoint.rules",
+                  "docs/projects/hotpot-tracker-ai-backend/rules/instantdb-admin-usage.rules",
+                  "docs/projects/hotpot-tracker-ai-backend/rules/authentication-security.rules"
                 ]
               }
             ]
@@ -111,9 +107,9 @@
       {
         "group": "Rules",
         "pages": [
-          "docs/rules/001-instantdb-usage-rules.rules",
-          "docs/rules/002-react-component-rules.rules",
-          "docs/rules/003-code-organization-rules.rules"
+          "docs/rules/instantdb-usage-rules.rules",
+          "docs/rules/react-component-rules.rules",
+          "docs/rules/code-organization-rules.rules"
         ]
       }
     ]
